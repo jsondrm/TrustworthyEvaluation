@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:include="include :: header">
+    <meta charset="UTF-8">
+    <title>设计阶段编辑度量指标</title>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content ">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox-content">
+                <form class="form-horizontal m-t" id="signUpForm">
+                    <input id="id" name="id" th:value="${softData.id}"
+                           class="form-control" type="hidden">
+                    <input id="softwareNumber" name="softwareNumber" th:value="${softData.softwareNumber}"
+                           class="form-control" type="hidden">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">阶段：</label>
+                        <div class="col-sm-8">
+                            <input id="phase" name="phase" th:value="${softData.phase}"
+                                   class="form-control" type="text">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">属性：</label>
+                        <div class="col-sm-8">
+                            <input id="attribute" name="attribute" th:value="${softData.attribute}"
+                                   class="form-control" type="text">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">子属性：</label>
+                        <div class="col-sm-8">
+                            <input id="subAttribute" name="subAttribute" th:value="${softData.subAttribute}"
+                                   class="form-control" type="text">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">度量元：</label>
+                        <div class="col-sm-8">
+                            <input id="metricElement" name="metricElement"
+                                   th:value="${softData.metricElement}" class="form-control"
+                                   type="text">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">目标：</label>
+                        <div class="col-sm-8">
+                            <input id="target" name="target" th:value="${softData.target}"
+                                   class="form-control" type="text">
+                        </div>
+                    </div>
+                    <div class="form-group hidden">
+                        <label class="col-sm-3 control-label ">度量指标：</label>
+                        <div class="col-sm-8">
+                            <input id="metricIndex" name="metricIndex"
+                                   th:value="${softData.metricIndex}" class="form-control"
+                                   type="text">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">度量指标类型：</label>
+                        <div class="col-sm-8">
+                            <input id="metricType" name="metricType"
+                                   th:value="${softData.metricType}" class="form-control" type="text">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">指标定义：</label>
+                        <div class="col-sm-8">
+                            <input id="metricDefinition" name="metricDefinition"
+                                   th:value="${softData.metricDefinition}" class="form-control" type="text">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">x和y具体含义：</label>
+                        <div class="col-sm-8">
+                            <input id="x_y_spec" name="x_y_spec"
+                                   th:value="${softData.x_y_spec}" class="form-control" type="text">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">x的值：</label>
+                        <div class="col-sm-8">
+                            <input id="x_value" name="x_value"
+                                   th:value="${softData.x_value}" class="form-control" type="text">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">y的值：</label>
+                        <div class="col-sm-8">
+                            <input id="y_value" name="y_value"
+                                   th:value="${softData.y_value}" class="form-control" type="text">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-8 col-sm-offset-3">
+                            <button type="submit" class="btn btn-primary">提交</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript" src="/js/appjs/softData/designPhase/edit.js">
+</script>
+</body>
+</html>

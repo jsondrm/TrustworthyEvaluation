@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:include="include :: header">
+    <meta charset="UTF-8">
+    <title>编辑软件产品</title>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content ">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="signUpForm">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">编号：</label>
+                            <div class="col-sm-8">
+                                <input id="number" name="number" th:value="${softwareProduct.number}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">名称：</label>
+                            <div class="col-sm-8">
+                                <input id="softwareName" name="softwareName" th:value="${softwareProduct.softwareName}"
+                                       class="form-control" type="text">
+                            </div>
+                        </div>
+                        <input id="status" name="status" th:value="${softwareProduct.status}"
+                               class="form-control" type="hidden">
+                        <input id="keXinDu" name="keXinDu" th:value="${softwareProduct.keXinDu}"
+                               class="form-control" type="hidden">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">项目组长：</label>
+                            <div class="col-sm-8">
+                                <input id="leader" name="leader" th:value="${softwareProduct.leader}"
+                                       class="form-control" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">开发负责人：</label>
+                            <div class="col-sm-8">
+                                <input id="developManager" name="developManager" class="form-control" th:value="${softwareProduct.developManager}" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">测试负责人：</label>
+                            <div class="col-sm-8">
+                                <input id="testManager" name="testManager"
+                                       th:value="${softwareProduct.testManager}" class="form-control"
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">质量管理负责人：</label>
+                            <div class="col-sm-8">
+                                <input id="QAManager" name="QAManager"
+                                       th:value="${softwareProduct.QAManager}" class="form-control" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">保密等级：</label>
+                            <div class="col-sm-8">
+                                <input id="securityLevel" name="securityLevel"
+                                       th:value="${softwareProduct.securityLevel}" class="form-control"
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">描述：</label>
+                            <div class="col-sm-8">
+                                <textarea id="description" name="description"
+                                          th:value="${softwareProduct.description}" class="form-control" ></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-3">
+                                <button type="submit" class="btn btn-primary">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript" src="/js/appjs/softwareProduct/edit.js">
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+server:
+  port: 8081
+spring:
+  profiles:
+    active: product
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML5
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+    cache: false
+  jackson:
+    date-format: yyyy-MM-dd
+    time-zone: GMT+8
+logging:
+  config: classpath:log4j2.xml
+

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:include="include :: header">
+    <meta charset="UTF-8">
+    <title>可信度</title>
+</head>
+<body>
+<form>
+    <div >
+        <table class="table table-bordered">
+            <!--<caption th:text="${map.key}"></caption>-->
+            <thead>
+            <tr>
+                <th>子属性名称</th>
+                <th>子属性可信度</th>
+                <!--<th th:each="metricElement : ${map.value}" th:text="${metricElement}"></th>-->
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="map : ${subAttributeKeXinDuMap}">
+                <td th:text="${map.key}"></td>
+                <td th:text="${map.value}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</form>
+<div th:include="include::footer"></div>
+<!--<script type="text/javascript" src="/js/appjs/softData/requirePhase/add.js"></script>-->
+</body>
+</html>

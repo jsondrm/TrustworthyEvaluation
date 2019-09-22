@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:include="include :: header">
+    <meta charset="UTF-8">
+    <title>权重显示页面</title>
+</head>
+<body>
+<form>
+    <div >
+        <table class="table table-bordered">
+            <!--<caption th:text="${map.key}"></caption>-->
+            <thead>
+            <tr>
+                <th>属性名称</th>
+                <th>权重</th>
+                <!--<th th:each="metricElement : ${map.value}" th:text="${metricElement}"></th>-->
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="map : ${attributeWeightMap}">
+                <td th:text="${map.key}"></td>
+                <td th:text="${map.value}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div >
+        <table class="table table-bordered">
+            <!--<caption th:text="${map.key}"></caption>-->
+            <thead>
+            <tr>
+                <th>属性名称</th>
+                <th>子属性名称</th>
+                <th>权重</th>
+                <!--<th th:each="metricElement : ${map.value}" th:text="${metricElement}"></th>-->
+            </tr>
+            </thead>
+            <tbody th:each="map: ${subAttributeToAttributeWeightMap}">
+            <tr th:each="subAttributeMap,star2 : ${map.value}">
+                <span th:if="${star2.index} == 0"  >
+                    <td th:rowspan="${star2.size}"><span th:text="${map.key}">属性</span></td>
+                    <td><span th:text="${subAttributeMap.key}">子属性</span></td>
+                    <td><span th:text="${subAttributeMap.value}">权重</span></td>
+                </span>
+                <span th:if="${star2.index} != 0">
+                    <td><span th:text="${subAttributeMap.key}">子属性</span></td>
+                    <td><span th:text="${subAttributeMap.value}">权重</span></td>
+                </span>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div >
+        <table class="table table-bordered">
+            <!--<caption th:text="${map.key}"></caption>-->
+            <thead>
+            <tr>
+                <th>子属性名称</th>
+                <th>度量元名称</th>
+                <th>权重</th>
+                <!--<th th:each="metricElement : ${map.value}" th:text="${metricElement}"></th>-->
+            </tr>
+            </thead>
+            <tbody th:each="map: ${metricElementToSubAttributeWeightMap}">
+            <tr th:each="metricElementMap,star2 : ${map.value}">
+                <span th:if="${star2.index} == 0"  >
+                    <td th:rowspan="${star2.size}"><span th:text="${map.key}">子属性</span></td>
+                    <td><span th:text="${metricElementMap.key}">度量元</span></td>
+                    <td><span th:text="${metricElementMap.value}">权重</span></td>
+                </span>
+                <span th:if="${star2.index} != 0">
+                    <td><span th:text="${metricElementMap.key}">度量元</span></td>
+                    <td><span th:text="${metricElementMap.value}">权重</span></td>
+                </span>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</form>
+<div th:include="include::footer"></div>
+</body>
+</html>

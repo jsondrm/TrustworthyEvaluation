@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:include="include :: header">
+    <meta charset="UTF-8">
+    <title>权重计算页面</title>
+</head>
+<body class="gray-bg">
+<p>度量元正互反矩阵</p>
+<form>
+    <div th:each="map : ${resMap}">
+        <table class="table table-bordered">
+            <caption th:text="${map.key}"></caption>
+            <thead>
+            <tr>
+                <th>度量元</th>
+                <th th:each="metricElement : ${map.value}" th:text="${metricElement}"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="metricElement : ${map.value}">
+                <td th:text="${metricElement}"></td>
+                <td th:each="metricElement : ${map.value}"><input type="text" name="metricElementMatrixArrayInTestPhase[]"
+                                                                  id="metricElementMatrixArrayInTestPhase"
+                                                                  value="1"/>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-8 col-sm-offset-3">
+            <input type="button" class="btn btn-success" id="saveData" th:value="保存数据"/>
+            <input type="button" class="btn btn-primary" id="submitData" th:value="提交"/>
+
+            <button type="reset" class="btn btn-warning">重置数据</button>
+        </div>
+    </div>
+</form>
+
+
+<div th:include="include::footer"></div>
+<script type="text/javascript" src="/js/appjs/softData/testPhase/inputMetricElementMatrix.js"></script>
+<!--<script type="text/javascript">
+
+    //①先将数组的值存入localstorage
+    var metricElementMatrixArray = document.getElementsByName("metricElementMatrixArray[]");
+
+    function saveArray() {
+        var arrayNew = [];
+        for (var i = 0; i < metricElementMatrixArray.length; i++) {
+            if (metricElementMatrixArray[i]) {
+                arrayNew.push(metricElementMatrixArray[i].value);
+            }
+        }
+        localStorage.setItem('metricElementMatrixArray', JSON.stringify(arrayNew));
+    }
+
+    //点击保存数据按钮，调用保存方法
+    $("#saveData").click(function () {
+        saveArray();
+        //console.log('保存成功');
+    })
+
+    //加载页面，将保存在localstorage中的数据显示在页面上
+    $(document).ready(function () {
+        var arrayOld = JSON.parse(localStorage.getItem('metricElementMatrixArray'));
+        if(arrayOld != null) {
+            for (var i = 0; i < arrayOld.length; i++) {
+                metricElementMatrixArray[i].value = arrayOld[i];
+            }
+        }
+    });
+
+    //点击下一步按钮，跳转到子属性正互反矩阵输入页面
+    /*$("#nextStep").click(function () {
+        var metricElementMatrixArray = localStorage.getItem('metricElementMatrixArray');
+        //var metricElementMatrixArray = document.getElementsByName("metricElementMatrixArray[]");
+        $.ajax({
+            type:"POST",
+            async:false,
+            //traditional:true,
+            dataType:"json",//服务端（后台）返回的数据类型
+            contentType:"application/json",//客户端（前端）发送的数据类型
+            url:"/softData/requirePhase/checkCRMetricElement",
+            data:JSON.stringify(metricElementMatrixArray),
+            success:function(data){
+                if(data.code == 1){
+                    alert(data.msg);
+                }else{
+                    window.location.href = "/softData/requirePhase/inputSubAttributeMatrix";
+                }
+            }
+        });
+    })*/
+
+    $("#nextStep").click(function () {
+        window.location.href = "/softData/requirePhase/inputSubAttributeMatrix";
+    })
+</script>-->
+</body>
+</html>

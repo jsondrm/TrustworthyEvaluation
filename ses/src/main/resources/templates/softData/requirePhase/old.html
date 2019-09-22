@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:include="include :: header">
+    <meta charset="UTF-8">
+    <title>权重计算页面</title>
+</head>
+<body>
+<form class="form-inline">
+    <div class="form-group col-sm-offset-1" >
+        <input type="button" class="btn btn-primary" id="inputMatrix" th:value="度量元正互反矩阵">
+    </div>
+    <div class="form-group col-sm-offset-1">
+        <input type="button" class="btn btn-primary" id="inputSubAttributeMatrix" th:value="子属性正互反矩阵">
+    </div>
+    <div class="form-group col-sm-offset-1">
+        <input type="button" class="btn btn-primary" id="inputAttributeMatrix" th:value="属性正互反矩阵">
+    </div>
+</form>
+<form action="/softData/requirePhase/countWeight" method="post">
+    <div th:each="map : ${resMap}">
+        <table class="table table-bordered">
+            <caption th:text="${map.key}"></caption>
+            <thead>
+            <tr>
+                <th>度量元</th>
+                <th th:each="metricElement : ${map.value}" th:text="${metricElement}"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="metricElement : ${map.value}">
+                <td th:text="${metricElement}"></td>
+                <td th:each="metricElement : ${map.value}"><input type="text" name="array[]" id="array" value="1"/>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-8 col-sm-offset-3">
+            <input type="button" class="btn btn-success" id="saveData" th:value="保存数据"/>
+            <button type="submit" class="btn btn-primary">提交</button>
+            <button type="reset" class="btn btn-warning">重置</button>
+        </div>
+    </div>
+</form>
+<div th:include="include::footer"></div>
+<!--<script type="text/javascript" src="/js/appjs/softData/requirePhase/add.js"></script>-->
+<script type="text/javascript">
+
+    //①先将数组的值存入localstorage
+    var array = document.getElementsByName("array[]");
+    function saveArray() {
+        var arrayNew = [];
+        for (var i = 0; i < array.length; i++) {
+            if (array[i]) {
+                arrayNew.push(array[i].value);
+            }
+        }
+        localStorage.setItem('array',JSON.stringify(arrayNew));
+    }
+
+    //点击保存数据按钮，调用保存方法
+    $("#saveData").click(function () {
+        saveArray();
+        //console.log('保存成功');
+    })
+
+    //加载页面，将保存在localstorage中的数据显示在页面上
+    $(document).ready(function () {
+        var arrayOld = JSON.parse(localStorage.getItem('array'));
+        for(var i = 0; i < arrayOld.length; i++){
+            array[i].value = arrayOld[i];
+        }
+    });
+</script>
+</body>
+</html>

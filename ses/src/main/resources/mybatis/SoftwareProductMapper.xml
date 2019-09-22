@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.soft.eva.dao.SoftwareProductDao">
+
+    <select id="get" resultType="com.soft.eva.domain.SoftwareProduct">
+		select `number`,`softwareName`,`keXinDu`,`status`,`leader`,`developManager`,`testManager`,`QAManager`,`securityLevel`,`description` from sys_softwareProduct where number = #{value}
+	</select>
+
+    <select id="list" resultType="com.soft.eva.domain.SoftwareProduct">
+        select
+        `number`,`softwareName`,`keXinDu`,`status`,`leader`,`developManager`,`testManager`,`QAManager`,`securityLevel`,`description`
+        from sys_softwareProduct
+        <where>
+            <if test="number != null and number != ''">and number = #{number}</if>
+            <if test="softwareName != null and softwareName != ''">and softwareName = #{softwareName}</if>
+            <if test="keXinDu != null and keXinDu != ''">and keXinDu = #{keXinDu}</if>
+            <if test="status != null and status != ''">and status = #{status}</if>
+            <if test="leader != null and leader != ''">and leader = #{leader}</if>
+            <if test="developManager != null and developManager != ''">and developManager = #{developManager}</if>
+            <if test="testManager != null and testManager != ''">and group = #{testManager}</if>
+            <if test="QAManager != null and QAManager != ''">and QAManager = #{QAManager}</if>
+            <if test="securityLevel != null and securityLevel != ''">and securityLevel = #{securityLevel}</if>
+            <if test="description != null and description != ''">and description = #{description}</if>
+        </where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+            <otherwise>
+                order by number desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="count" resultType="int">
+        select count(*) from sys_softwareProduct
+        <where>
+            <if test="number != null and number != ''">and number = #{number}</if>
+            <if test="softwareName != null and softwareName != ''">and softwareName = #{softwareName}</if>
+            <if test="keXinDu != null and keXinDu != ''">and keXinDu = #{keXinDu}</if>
+            <if test="status != null and status != ''">and status = #{status}</if>
+            <if test="leader != null and leader != ''">and leader = #{leader}</if>
+            <if test="developManager != null and developManager != ''">and developManager = #{developManager}</if>
+            <if test="testManager != null and testManager != ''">and group = #{testManager}</if>
+            <if test="QAManager != null and QAManager != ''">and QAManager = #{QAManager}</if>
+            <if test="securityLevel != null and securityLevel != ''">and securityLevel = #{securityLevel}</if>
+            <if test="description != null and description != ''">and description = #{description}</if>
+        </where>
+    </select>
+
+    <insert id="save" parameterType="com.soft.eva.domain.SoftwareProduct" useGeneratedKeys="true" keyProperty="number">
+		insert into sys_softwareProduct
+		(
+			`number`,
+			`softwareName`,
+			`keXinDu`,
+			`status`,
+			`leader`,
+			`developManager`,
+			`testManager`,
+			`QAManager`,
+			`securityLevel`,
+			`description`
+		)
+		values
+		(
+			#{number},
+			#{softwareName},
+			#{keXinDu},
+			#{status},
+			#{leader},
+			#{developManager},
+			#{testManager},
+			#{QAManager},
+			#{securityLevel},
+			#{description}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.soft.eva.domain.SoftwareProduct">
+        update sys_softwareProduct
+        <set>
+            <if test="softwareName != null">`softwareName` = #{softwareName},</if>
+            <if test="keXinDu != null"> `keXinDu` = #{keXinDu},</if>
+            <if test="status != null"> `status` = #{status},</if>
+            <if test="leader != null">`leader` = #{leader},</if>
+            <if test="developManager != null">`developManager` = #{developManager},</if>
+            <if test="testManager != null">`testManager` = #{testManager},</if>
+            <if test="QAManager != null">`QAManager` = #{QAManager},</if>
+            <if test="securityLevel != null">`securityLevel` = #{securityLevel},</if>
+            <if test="description != null">`description` = #{description},</if>
+        </set>
+        where number = #{number}
+    </update>
+
+    <delete id="remove">
+		delete from sys_softwareProduct where number = #{value}
+	</delete>
+
+    <delete id="batchRemove">
+        delete from sys_softwareProduct where number in
+        <foreach item="number" collection="array" open="(" separator="," close=")">
+            #{number}
+        </foreach>
+    </delete>
+
+</mapper>

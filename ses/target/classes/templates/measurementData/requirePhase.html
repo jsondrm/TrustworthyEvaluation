@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:include="include :: header">
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+    <ul class="nav nav-pills">
+        <li class="active"><a th:href="@{/measurementData//showMeasurementDataListInRequirePhase}" th:value="需求阶段">需求阶段</a></li>
+        <li><a th:href="@{/measurementData//showMeasurementDataListInDesignPhase}" th:value="设计阶段">设计阶段</a></li>
+        <li><a th:href="@{/measurementData//showMeasurementDataListInCodingPhase}" th:value="编码阶段">编码阶段</a></li>
+        <li><a th:href="@{/measurementData//showMeasurementDataListInTestPhase}" th:value="测试阶段">测试阶段</a></li>
+    </ul>
+</div>
+<div >
+    <table class="table table-bordered">
+        <!--<caption th:text="${map.key}"></caption>-->
+        <thead>
+        <tr>
+            <th>名称</th>
+            <th>所属阶段</th>
+            <th>类型</th>
+            <th>权重</th>
+            <th>可信度</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="element : ${measurementDataListInRequirePhase}">
+            <td th:text="${element.name}"></td>
+            <td th:text="${element.phaseBelongsTo}"></td>
+            <td th:text="${element.type}">
+            <td th:text="${element.weight}">
+            <td th:text="${element.keXinDu}">
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div th:include="include::footer"></div>
+</body>
+</html>

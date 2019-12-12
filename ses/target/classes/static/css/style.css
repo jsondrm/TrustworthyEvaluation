@@ -3364,9 +3364,9 @@ nav.page-tabs .page-tabs-content {
 .dropdown-menu-right {
     left: auto;
 }
-
+/* -140px : -40px*/
 #content-main {
-    height: calc(100% - 140px);
+    height: calc(100% - 40px);
     overflow: hidden;
 }
 

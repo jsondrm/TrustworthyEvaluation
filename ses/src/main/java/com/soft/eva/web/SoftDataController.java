@@ -4,6 +4,7 @@ import com.mongodb.MongoWriteException;
 import com.soft.eva.domain.*;
 import com.soft.eva.dto.Page;
 import com.soft.eva.service.MeasurementDataService;
+import com.soft.eva.service.OperateRecordService;
 import com.soft.eva.service.SoftDataService;
 import com.soft.eva.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,6 +104,7 @@ public class SoftDataController {
     public PageUtils softDataListInRequirePhase(@RequestParam(value = "limit", required = false) Integer limit,@RequestParam(value = "offset", required = false) Integer offset,@RequestParam(value = "curSoftwareNumber", required = false) String curSoftwareNumber){
         //查询列表数据
         //因为是服务端分页，返回值必须告诉前端总记录的条数total和当前页的记录数rows
+
         Page page = new Page(offset/limit+1, limit);
 //        page = softDataService.findByPage(page);
         String[] fields = {"softwareNumber","phase"};
@@ -344,7 +346,7 @@ public class SoftDataController {
             Map<String,Double> metricElementKeXinDuMap = new CountKeXinDu().countMetricElementKeXinDu(softDataListsInRequirePhase);
 
             Map<String,Double> metricElementWeightMap = new CountWeight().countWeight_MetricElement( matrixListsInRequirePhase.get(0), softDataListsInRequirePhase);
-            Map<String,Double> subAttributeKeXinDuMap = new CountKeXinDu().countParentKeXinDu(subAttributeMap, metricElementKeXinDuMap, metricElementWeightMap);
+            Map<String,Double> subAttributeKeXinDuMap = new CountKeXinDu().countSubAttributeKeXinDu(subAttributeMap, metricElementKeXinDuMap, metricElementWeightMap);
             List<MeasurementData> measurementDataListForMetricElement = new MeasurementData().getMeasurementList(softwareNumber,"度量元", "需求阶段",metricElementKeXinDuMap, metricElementWeightMap);
             measurementDataService.upsert(measurementDataListForMetricElement);
 
@@ -503,6 +505,27 @@ public class SoftDataController {
     }
 
     /**
+     * 设计阶段 修改正互反矩阵，跳到上传凭证说明页面
+     * @return
+     *//*
+    @RequestMapping(value = "/designPhase/upload",method = RequestMethod.GET)
+    public String changeAttributeMatrixInDesignPhase(){
+        return "softData/designPhase/upload";
+    }
+
+    *//**
+     * 设计阶段 提交凭证说明
+     * @param softData
+     * @return
+     *//*
+    @ResponseBody
+    @RequestMapping(value = "/designPhase/submit",method = RequestMethod.POST)
+    public ReturnUtil submitProofInDesignPhase(SoftData softData){
+        softDataService.save(softData);
+        return ReturnUtil.ok();
+    }*/
+
+    /**
      * 设计阶段 输入正互反矩阵（度量元）
      * 跳转到输入页面 resMap 是存储度量元的哈希表
      * @param model
@@ -651,7 +674,7 @@ public class SoftDataController {
             Map<String,List<String>> subAttributeMap = new FindAll().findAllMetricElementToEachSubAttribute(softDataListsInDesignPhase);
             Map<String,Double> metricElementKeXinDuMap = new CountKeXinDu().countMetricElementKeXinDu(softDataListsInDesignPhase);
             Map<String,Double> metricElementWeightMap = new CountWeight().countWeight_MetricElement( matrixListsInDesignPhase.get(0), softDataListsInDesignPhase);
-            Map<String,Double> subAttributeKeXinDuMap = new CountKeXinDu().countParentKeXinDu(subAttributeMap, metricElementKeXinDuMap, metricElementWeightMap);
+            Map<String,Double> subAttributeKeXinDuMap = new CountKeXinDu().countSubAttributeKeXinDu(subAttributeMap, metricElementKeXinDuMap, metricElementWeightMap);
             List<MeasurementData> measurementDataListForMetricElement = new MeasurementData().getMeasurementList(softwareNumber,"度量元", "设计阶段",metricElementKeXinDuMap, metricElementWeightMap);
             measurementDataService.upsert(measurementDataListForMetricElement);
 
@@ -954,7 +977,7 @@ public class SoftDataController {
             Map<String,List<String>> subAttributeMap = new FindAll().findAllMetricElementToEachSubAttribute(softDataListsInCodingPhase);
             Map<String,Double> metricElementKeXinDuMap = new CountKeXinDu().countMetricElementKeXinDu(softDataListsInCodingPhase);
             Map<String,Double> metricElementWeightMap = new CountWeight().countWeight_MetricElement( matrixListsInCodingPhase.get(0), softDataListsInCodingPhase);
-            Map<String,Double> subAttributeKeXinDuMap = new CountKeXinDu().countParentKeXinDu(subAttributeMap, metricElementKeXinDuMap, metricElementWeightMap);
+            Map<String,Double> subAttributeKeXinDuMap = new CountKeXinDu().countSubAttributeKeXinDu(subAttributeMap, metricElementKeXinDuMap, metricElementWeightMap);
             List<MeasurementData> measurementDataListForMetricElement = new MeasurementData().getMeasurementList(softwareNumber,"度量元", "编码阶段",metricElementKeXinDuMap, metricElementWeightMap);
             measurementDataService.upsert(measurementDataListForMetricElement);
 
@@ -1254,7 +1277,7 @@ public class SoftDataController {
             Map<String,List<String>> subAttributeMap = new FindAll().findAllMetricElementToEachSubAttribute(softDataListsInTestPhase);
             Map<String,Double> metricElementKeXinDuMap = new CountKeXinDu().countMetricElementKeXinDu(softDataListsInTestPhase);
             Map<String,Double> metricElementWeightMap = new CountWeight().countWeight_MetricElement( matrixListsInTestPhase.get(0), softDataListsInTestPhase);
-            Map<String,Double> subAttributeKeXinDuMap = new CountKeXinDu().countParentKeXinDu(subAttributeMap, metricElementKeXinDuMap, metricElementWeightMap);
+            Map<String,Double> subAttributeKeXinDuMap = new CountKeXinDu().countSubAttributeKeXinDu(subAttributeMap, metricElementKeXinDuMap, metricElementWeightMap);
             List<MeasurementData> measurementDataListForMetricElement = new MeasurementData().getMeasurementList(softwareNumber,"度量元", "测试阶段",metricElementKeXinDuMap, metricElementWeightMap);
             measurementDataService.upsert(measurementDataListForMetricElement);
 

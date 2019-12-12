@@ -9,8 +9,11 @@
     <p>属性正互反矩阵</p>
     <form class="form-horizontal m-t">
         <div th:each="map : ${resMap}">
-            <table class="table table-bordered">
+            <table class="table table-bordered" id="designAttributeTable">
                 <caption th:text="${map.key}"></caption>
+                <!--<button type="button" class="btn btn-primary" onclick="change()">
+                    <i class="fa fa-edit" aria-hidden="true"></i>修改
+                </button>-->
                 <thead>
                 <tr>
                     <th>属性</th>
@@ -21,7 +24,7 @@
                 <tr th:each="attribute : ${map.value}">
                     <td th:text="${attribute}"></td>
                     <td th:each="attribute : ${map.value}"><input type="text" name="attributeMatrixArrayInDesignPhase[]" id="attributeMatrixArrayInDesignPhase"
-                                                                     value="1"/>
+                                                                     value="1" disabled="true"/>
                     </td>
                 </tr>
                 </tbody>
@@ -29,6 +32,9 @@
         </div>
         <div class="form-group">
             <div class="col-sm-8 col-sm-offset-3">
+                <button type="button" class="btn btn-primary" onclick="change()">
+                    <i class="fa fa-edit" aria-hidden="true"></i>修改
+                </button>
                 <input type="button" class="btn btn-success" id="saveData" th:value="保存数据"/>
                 <input type="button" class="btn btn-success" id="nextStep" th:value="下一步"/>
                 <button type="reset" class="btn btn-warning">重置数据</button>
@@ -38,63 +44,5 @@
 </div>
 <div th:include="include::footer"></div>
 <script type="text/javascript" src="/js/appjs/softData/designPhase/inputAttributeMatrix.js"></script>
-<!--<script type="text/javascript">
-
-    //①先将数组的值存入localstorage
-    var attributeMatrixArray = document.getElementsByName("attributeMatrixArray[]");
-
-    function saveArray() {
-        var arrayNew = [];
-        for (var i = 0; i < attributeMatrixArray.length; i++) {
-            if (attributeMatrixArray[i]) {
-                arrayNew.push(attributeMatrixArray[i].value);
-            }
-        }
-        localStorage.setItem('attributeMatrixArray', JSON.stringify(arrayNew));
-    }
-
-    //点击保存数据按钮，调用保存方法
-    $("#saveData").click(function () {
-        saveArray();
-        //console.log('保存成功');
-    })
-
-    //加载页面，将保存在localstorage中的数据显示在页面上
-    $(document).ready(function () {
-        var arrayOld = JSON.parse(localStorage.getItem('attributeMatrixArray'));
-        if(arrayOld != null){
-            for (var i = 0; i < arrayOld.length; i++) {
-                attributeMatrixArray[i].value = arrayOld[i];
-            }
-        }
-    });
-
-    //提交数据
-    $("#submitData").click(function () {
-        //console.log("准备计算权重");
-        var zhenghufanMatrix;
-        zhenghufanMatrix = {
-            "metricElementMatrixArray": localStorage.getItem('metricElementMatrixArray'),
-            "subAttributeMatrixArray": localStorage.getItem('subAttributeMatrixArray'),
-            "attributeMatrixArray": localStorage.getItem('attributeMatrixArray')
-        };
-        $.ajax({
-            type:"POST",
-            async:false,
-            dataType:"json",//服务端（后台）返回的数据类型
-            contentType:"application/json",//客户端（前端）发送的数据类型
-            url:"/softData/requirePhase/countWeightByMatrix",
-            data:JSON.stringify(zhenghufanMatrix),
-            success:function(data){
-                if(data.code == 1){
-                    alert(data.msg);
-                }else{
-                    alert("提交成功！");
-                    window.location.href = "/softData/requirePhase/displayWeight";
-                }
-            }
-        });
-    })
-</script>-->
 </body>
 </html>

@@ -118,6 +118,7 @@ public class CountWeight {
             for(int j = 0; j < n; j++){
                 String curElement = curChildrenList.get(j);
                 double curWeight = weightMap.get(String.valueOf(j));
+                curWeight = new Round().round(curWeight, 2) ;
                 resMap.put(curElement,curWeight);
             }
         }

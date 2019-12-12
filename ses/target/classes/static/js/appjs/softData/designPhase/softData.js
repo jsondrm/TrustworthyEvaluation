@@ -1,34 +1,15 @@
 var prefix = "/softData/designPhase";
+currentUser = localStorage.getItem("currentUsername");
 $(function () {
+    if(currentUser != "hewenxuan"){
+        var buttons = document.getElementsByTagName("button");
+        for(var i = 0; i < buttons.length; i++){
+            buttons[i].setAttribute("disabled", true)
+        }
+    }
     load();
 });
 
-/*function selectLoad() {
-    var html = "";
-    $.ajax({
-        url : '/softData/requirePhase/type',
-        success : function (data) {
-            //加载数据
-            for(var i = 0; i < data.length; i++){
-                html += '<option value="' + data[i].type + '">' + data[i].description + '</option>'
-            }
-            $(".chosen-select").append(html);
-            $(".chosen-select").chosen({
-                maxHeight : 200
-            });
-            //点击事件
-            $('.chosen-select').on('change',function (e, params) {
-                console.log(params.selected);
-                var opt = {
-                    query : {
-                        type : params.selected,
-                    }
-                }
-                $('#exampleTable').bootstrapTable('refresh', opt);
-            });
-        }
-    });
-}*/
 function load() {
     // selectLoad();
     $('#exampleTable').bootstrapTable('destroy');
@@ -131,8 +112,20 @@ function load() {
                     var d = '<a class="btn btn-warning btn-sm" href="#" title="删除" mce_href="#" onclick="remove(\''
                         + row.id
                         + '\')"><i class="fa fa-remove"></i></a>';
+                   /* var e1 = '<a class="btn btn-primary btn-sm" href="#" mce_href="#" title="编辑" disabled="true" onclick="edit(\''
+                        + row.id
+                        + '\')"><i class="fa fa-edit"></i></a>';
+                    var d1 = '<a class="btn btn-warning btn-sm" href="#" title="删除"  disabled="true" mce_href="#" onclick="remove(\''
+                        + row.id
+                        + '\')"><i class="fa fa-remove"></i></a>';*/
                     return e + d;
 
+                    /*var currentUser = localStorage.getItem("currentUsername");
+                    if(currentUser != "hewenxuan"){
+                        return e1 + d1;
+                    }else{
+                        return e + d;
+                    }*/
                 }
             }
         ]
@@ -188,83 +181,102 @@ function reLoad() {
 
 //添加
 function add() {
-    layer.open({
-        type: 2,
-        title: '增加度量指标',
-        maxmin: true,
-        shadeClose: false, // 点击遮罩关闭层
-        area: ['800px', '600px'],
-        content: prefix + '/add' // iframe的url
-    });
+    if(currentUser != "hewenxuan"){
+        alert("请联系管理员进行添加！");
+    }else{
+        layer.open({
+            type: 2,
+            title: '增加度量指标',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '600px'],
+            content: prefix + '/add' // iframe的url
+        });
+    }
+
 }
 
 //编辑
 function edit(id) {
-    layer.open({
-        type: 2,
-        title: '编辑度量指标',
-        maxmin: true,
-        shadeClose: false, // 点击遮罩关闭层
-        area: ['800px', '600px'],
-        content: prefix + '/edit/' + id // iframe的url
-    });
+    if(currentUser != "hewenxuan"){
+        alert("请联系管理员进行编辑！");
+    }else{
+        layer.open({
+            type: 2,
+            title: '编辑度量指标',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '600px'],
+            content: prefix + '/edit/' + id // iframe的url
+        });
+    }
+
 }
 
 //删除
 function remove(id) {
-    layer.confirm('确定要删除选中的记录？', {
-        btn: ['确定', '取消']
-    }, function () {
-        $.ajax({
-            url: prefix + "/remove",
-            type: "post",
-            data: {
-                'id': id
-            },
-            success: function (r) {
-                if (r.code == 0) {
-                    layer.msg(r.msg);
-                    reLoad();
-                } else {
-                    layer.msg(r.msg);
+    if(currentUser != "hewenxuan"){
+        alert("请联系管理员进行删除！");
+    }else{
+        layer.confirm('确定要删除选中的记录？', {
+            btn: ['确定', '取消']
+        }, function () {
+            $.ajax({
+                url: prefix + "/remove",
+                type: "post",
+                data: {
+                    'id': id
+                },
+                success: function (r) {
+                    if (r.code == 0) {
+                        layer.msg(r.msg);
+                        reLoad();
+                    } else {
+                        layer.msg(r.msg);
+                    }
                 }
-            }
-        });
-    })
+            });
+        })
+    }
 }
 
 
 //批量删除
 function batchRemove() {
-    var rows = $('#exampleTable').bootstrapTable('getSelections'); // 返回所有选择的行，当没有选择的记录时，返回一个空数组
-    if (rows.length == 0) {
-        layer.msg("请选择要删除的数据");
-        return;
-    }
-    layer.confirm("确认要删除选中的'" + rows.length + "'条数据吗?", {
-        btn: ['确定', '取消']
-        // 按钮
-    }, function () {
-        var ids = new Array();
-        // 遍历所有选择的行数据，取每条数据对应的ID
-        $.each(rows, function (i, row) {
-            ids[i] = row['id'];
-        });
-        $.ajax({
-            type: 'POST',
-            data: {
-                "ids": ids
-            },
-            url: prefix + '/batchRemove',
-            success: function (r) {
-                if (r.code == 0) {
-                    layer.msg(r.msg);
-                    reLoad();
-                } else {
-                    layer.msg(r.msg);
+    if(currentUser != "hewenxuan"){
+        alert("请联系管理员进行批量删除！");
+    }else{
+        var rows = $('#exampleTable').bootstrapTable('getSelections'); // 返回所有选择的行，当没有选择的记录时，返回一个空数组
+        if (rows.length == 0) {
+            layer.msg("请选择要删除的数据");
+            return;
+        }
+        layer.confirm("确认要删除选中的'" + rows.length + "'条数据吗?", {
+            btn: ['确定', '取消']
+            // 按钮
+        }, function () {
+            var ids = new Array();
+            // 遍历所有选择的行数据，取每条数据对应的ID
+            $.each(rows, function (i, row) {
+                ids[i] = row['id'];
+            });
+            $.ajax({
+                type: 'POST',
+                data: {
+                    "ids": ids
+                },
+                url: prefix + '/batchRemove',
+                success: function (r) {
+                    if (r.code == 0) {
+                        layer.msg(r.msg);
+                        reLoad();
+                    } else {
+                        layer.msg(r.msg);
+                    }
                 }
-            }
+            });
+        }, function () {
         });
-    }, function () {
-    });
+    }
+
 }

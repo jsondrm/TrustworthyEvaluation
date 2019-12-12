@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -111,7 +112,7 @@ public class MeasurementDataController{
                         String[] values_MetricElement = {curMetricElement ,curPhase};
                         MeasurementData measurementData = measurementDataService.findOne(fields_MetricElement, values_MetricElement);
                         double curKeXinDu = measurementData.getKeXinDu();
-                        if(curKeXinDu <= 0.7){
+                        if(curKeXinDu <= 8.5){
                             String[] fields = {"phase","metricElement"};
                             String[] values = {curPhase,curMetricElement};
                             SoftData softData = softDataService.findOne(fields,values);
@@ -178,8 +179,10 @@ public class MeasurementDataController{
             double curKeXinDu = measurementDataList.get(i).getKeXinDu();
             double curWeight = measurementDataList.get(i).getWeight();
             phaseKeXinDuList.add(curKeXinDu);
-            double curValue = new Round().round(Math.pow(curKeXinDu, curWeight), 3);
-            softwareKeXinDu = new Round().round(softwareKeXinDu*curValue, 3) ;
+            double curValue = Math.pow(curKeXinDu, curWeight);
+            BigDecimal b   =   new   BigDecimal(curValue);
+            double   value   =   b.setScale(2,   BigDecimal.ROUND_HALF_UP).doubleValue();
+            softwareKeXinDu = new Round().round(softwareKeXinDu*value, 2) ;
         }
         int count_keXinDuLessThan95 = 0;
         int count_keXinDuLessThan85 = 0;
@@ -187,29 +190,29 @@ public class MeasurementDataController{
         int count_keXinDuLessThan45 = 0;
         for(int i = 0; i < phaseKeXinDuList.size(); i++){
             double curKeXinDu = phaseKeXinDuList.get(i);
-            if(curKeXinDu <= 0.45){
+            if(curKeXinDu <= 4.5){
                 count_keXinDuLessThan45++;
                 count_keXinDuLessThan70++;
                 count_keXinDuLessThan85++;
                 count_keXinDuLessThan95++;
-            }else if(curKeXinDu > 0.45 && curKeXinDu <= 0.70){
+            }else if(curKeXinDu > 4.5 && curKeXinDu <= 7.0){
                 count_keXinDuLessThan70++;
                 count_keXinDuLessThan85++;
                 count_keXinDuLessThan95++;
-            }else if(curKeXinDu > 0.70 && curKeXinDu <= 0.85){
+            }else if(curKeXinDu > 7.0 && curKeXinDu <= 8.5){
                 count_keXinDuLessThan85++;
                 count_keXinDuLessThan95++;
-            }else if(curKeXinDu > 0.85 && curKeXinDu <= 0.95){
+            }else if(curKeXinDu > 8.5 && curKeXinDu <= 9.5){
                 count_keXinDuLessThan95++;
             }
         }
-        if(softwareKeXinDu >= 0.95 && count_keXinDuLessThan95 <= 1 && count_keXinDuLessThan85 == 0){
+        if(softwareKeXinDu >= 9.5 && count_keXinDuLessThan95 <= 1 && count_keXinDuLessThan85 == 0){
             keXinLevel = "5级";
-        }else if(softwareKeXinDu < 0.95 && softwareKeXinDu >= 0.85 && count_keXinDuLessThan85 <= 1 && count_keXinDuLessThan70 == 0){
+        }else if(softwareKeXinDu < 9.5 && softwareKeXinDu >= 8.5 && count_keXinDuLessThan85 <= 1 && count_keXinDuLessThan70 == 0){
             keXinLevel = "4级";
-        }else if(softwareKeXinDu < 0.85 && softwareKeXinDu >= 0.7 && count_keXinDuLessThan70 <= 1 && count_keXinDuLessThan45 == 0){
+        }else if(softwareKeXinDu < 8.5 && softwareKeXinDu >= 7.0 && count_keXinDuLessThan70 <= 1 && count_keXinDuLessThan45 == 0){
             keXinLevel = "3级";
-        }else if(softwareKeXinDu < 0.70 && softwareKeXinDu >= 0.45 && count_keXinDuLessThan45 == 0){
+        }else if(softwareKeXinDu < 7.0 && softwareKeXinDu >= 4.5 && count_keXinDuLessThan45 == 0){
             keXinLevel = "2级";
         }else{
             keXinLevel = "1级";

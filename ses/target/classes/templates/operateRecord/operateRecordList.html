@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<meta charset="UTF-8">
+<head th:include="include :: header">
+    <title>操作记录列表</title>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="col-sm-12">
+        <div class="ibox">
+            <div class="ibox-body">
+                <div class="fixed-table-toolbar">
+                    <div id="exampleToolbar" class="columns pull-left">
+                        <button  type="button" class="btn btn-danger" onclick="batchRemove()">
+                            <i class="fa fa-trash" aria-hidden="true"></i>批量删除
+                        </button>
+                    </div>
+                </div>
+
+                <table id="operateRecordTable" data-mobile-responsive="true"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div th:include="include :: footer"></div>
+<script type="text/javascript" src="/js/appjs/operateRecord/operateRecordList.js"></script>
+</body>
+</html>

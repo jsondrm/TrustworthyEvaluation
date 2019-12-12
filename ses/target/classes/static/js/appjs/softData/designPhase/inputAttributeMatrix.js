@@ -1,6 +1,25 @@
+var prefix = "/softData/designPhase";
+
+
 //①先将数组的值存入localstorage
 var attributeMatrixArray = document.getElementsByName("attributeMatrixArrayInDesignPhase[]");
+var currentUser = localStorage.getItem("currentUsername");
 
+function change(){
+    if(currentUser != "hewenxuan"){
+        alert("请联系管理员进行修改！");
+    }else{
+        layer.open({
+            type: 2,
+            title: '原始凭证上传',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '400px'],
+            content: "/operateRecord/designPhase" + '/upload' // iframe的url
+        });
+    }
+
+}
 function saveArray() {
     var arrayNew = [];
     for (var i = 0; i < attributeMatrixArray.length; i++) {

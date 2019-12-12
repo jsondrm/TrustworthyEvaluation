@@ -1,34 +1,15 @@
 var prefix = "/softData/designPhase";
+currentUser = localStorage.getItem("currentUsername");
 $(function () {
+    if(currentUser != "admin"){
+        var buttons = document.getElementsByTagName("button");
+        for(var i = 0; i < buttons.length; i++){
+            buttons[i].setAttribute("disabled", true)
+        }
+    }
     load();
 });
 
-/*function selectLoad() {
-    var html = "";
-    $.ajax({
-        url : '/softData/requirePhase/type',
-        success : function (data) {
-            //加载数据
-            for(var i = 0; i < data.length; i++){
-                html += '<option value="' + data[i].type + '">' + data[i].description + '</option>'
-            }
-            $(".chosen-select").append(html);
-            $(".chosen-select").chosen({
-                maxHeight : 200
-            });
-            //点击事件
-            $('.chosen-select').on('change',function (e, params) {
-                console.log(params.selected);
-                var opt = {
-                    query : {
-                        type : params.selected,
-                    }
-                }
-                $('#exampleTable').bootstrapTable('refresh', opt);
-            });
-        }
-    });
-}*/
 function load() {
     // selectLoad();
     $('#exampleTable').bootstrapTable('destroy');
@@ -131,8 +112,20 @@ function load() {
                     var d = '<a class="btn btn-warning btn-sm" href="#" title="删除" mce_href="#" onclick="remove(\''
                         + row.id
                         + '\')"><i class="fa fa-remove"></i></a>';
+                   /* var e1 = '<a class="btn btn-primary btn-sm" href="#" mce_href="#" title="编辑" disabled="true" onclick="edit(\''
+                        + row.id
+                        + '\')"><i class="fa fa-edit"></i></a>';
+                    var d1 = '<a class="btn btn-warning btn-sm" href="#" title="删除"  disabled="true" mce_href="#" onclick="remove(\''
+                        + row.id
+                        + '\')"><i class="fa fa-remove"></i></a>';*/
                     return e + d;
 
+                    /*var currentUser = localStorage.getItem("currentUsername");
+                    if(currentUser != "hewenxuan"){
+                        return e1 + d1;
+                    }else{
+                        return e + d;
+                    }*/
                 }
             }
         ]
@@ -158,21 +151,26 @@ $("#designPhaseFile").fileinput({
 });
 
 $("#uploadFile").click(function () {
-    var type = "designPhaseFile";
-    var id = "designPhaseFile";
-    var formData = new FormData();
-    formData.append(type,$("#"+id)[0].files[0]);
-    $.ajax({
-        type:"POST",
-        url:prefix + "/uploadFile",
-        data:formData,
-        processData:false,
-        contentType:false,
-        success:function(data){
-            alert(data);
-            window.location.href = "/softData/designPhase";
-        }
-    });
+    if(currentUser != "admin"){
+        var uploadButton = document.getElementById("uploadFile");
+        uploadButton.setAttribute("disabled",true);
+    }else{
+        var type = "designPhaseFile";
+        var id = "designPhaseFile";
+        var formData = new FormData();
+        formData.append(type,$("#"+id)[0].files[0]);
+        $.ajax({
+            type:"POST",
+            url:prefix + "/uploadFile",
+            data:formData,
+            processData:false,
+            contentType:false,
+            success:function(data){
+                alert(data);
+                window.location.href = "/softData/designPhase";
+            }
+        });
+    }
 });
 
 //查询
@@ -200,37 +198,46 @@ function add() {
 
 //编辑
 function edit(id) {
-    layer.open({
-        type: 2,
-        title: '编辑度量指标',
-        maxmin: true,
-        shadeClose: false, // 点击遮罩关闭层
-        area: ['800px', '600px'],
-        content: prefix + '/edit/' + id // iframe的url
-    });
+    if(currentUser != "admin"){
+        alert("请联系管理员进行编辑！");
+    }else{
+        layer.open({
+            type: 2,
+            title: '编辑度量指标',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '600px'],
+            content: prefix + '/edit/' + id // iframe的url
+        });
+    }
+
 }
 
 //删除
 function remove(id) {
-    layer.confirm('确定要删除选中的记录？', {
-        btn: ['确定', '取消']
-    }, function () {
-        $.ajax({
-            url: prefix + "/remove",
-            type: "post",
-            data: {
-                'id': id
-            },
-            success: function (r) {
-                if (r.code == 0) {
-                    layer.msg(r.msg);
-                    reLoad();
-                } else {
-                    layer.msg(r.msg);
+    if(currentUser != "admin"){
+        alert("请联系管理员进行删除！");
+    }else{
+        layer.confirm('确定要删除选中的记录？', {
+            btn: ['确定', '取消']
+        }, function () {
+            $.ajax({
+                url: prefix + "/remove",
+                type: "post",
+                data: {
+                    'id': id
+                },
+                success: function (r) {
+                    if (r.code == 0) {
+                        layer.msg(r.msg);
+                        reLoad();
+                    } else {
+                        layer.msg(r.msg);
+                    }
                 }
-            }
-        });
-    })
+            });
+        })
+    }
 }
 
 

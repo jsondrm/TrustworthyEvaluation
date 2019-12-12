@@ -37,9 +37,9 @@
             <form id="signupForm">
                 <h3 class="text-center">用户登录</h3>
                 <!--<p class="m-t-md text-center">欢迎登录可信测评工具后台管理系统</p>-->
-                <input type="text" name="username" class="form-control uname"
+                <input type="text" name="username" id="username" class="form-control uname"
                        th:value="${username}"/>
-                <input type="password" name="password"
+                <input type="password" name="password" id="password"
                        class="form-control pword m-b" th:value="${password}"/>
                 <a id="login" class="btn btn-login btn-block">登录</a>
             </form>
@@ -92,16 +92,21 @@
     });
 
     function login() {
+        var currentUsername = document.getElementById('username').value;
+
         $.ajax({
             type: "POST",
             url: "/ajaxLogin",
             data: $('#signupForm').serialize(),
             success: function (r) {
                 if (r.code == 0) {
+                    // console.log(currentUsername);
+                    localStorage.setItem("currentUsername", currentUsername);
                     var index = layer.load(1, {
                         shade: [0.1, '#fff'] //0.1透明度的白色背景
                     });
                     parent.location.href = '/index';
+                    // console.log(localStorage.getItem("currentUsername"));
                 } else {
                     layer.msg(r.msg);
                 }

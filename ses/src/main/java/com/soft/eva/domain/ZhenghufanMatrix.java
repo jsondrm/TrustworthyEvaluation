@@ -9,6 +9,10 @@ public class ZhenghufanMatrix {
     String subAttributeMatrixArray;
     String attributeMatrixArray;
 
+    public ZhenghufanMatrix(){
+
+    }
+
     public ZhenghufanMatrix(String metricElementMatrixArray, String subAttributeMatrixArray, String attributeMatrixArray) {
         this.metricElementMatrixArray = metricElementMatrixArray;
         this.subAttributeMatrixArray = subAttributeMatrixArray;

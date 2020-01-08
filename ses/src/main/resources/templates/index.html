@@ -162,7 +162,9 @@
                     <li class="J_tabCloseOther"><a>关闭其他选项卡</a></li>
                 </ul>
             </div>
-            <a href="/logout" class="roll-nav roll-right J_tabExit"><i
+            <!--<a href="/logout" class="roll-nav roll-right J_tabExit"><i-->
+                    <!--class="fa fa fa-sign-out"></i> 退出</a>-->
+            <a th:href="@{/}" class="roll-nav roll-right J_tabExit"><i
                     class="fa fa fa-sign-out"></i> 退出</a>
         </div>
         <!--中间主体部分-->
@@ -203,7 +205,8 @@
 <script src="/js/plugins/toastr/toastr.min.js"></script>
 <script type="text/javascript">
     var value = localStorage.getItem("curSoftwareNumberEvaluating");
-    document.getElementById("curSoftware").value = value;
+    // document.getElementById("curSoftware").value = value;
+    document.getElementById("curSoftware").setAttribute("value",value);
 </script>
 </body>
 </html>

@@ -6,6 +6,7 @@ import com.soft.eva.dto.Page;
 import com.soft.eva.service.MeasurementDataService;
 import com.soft.eva.service.OperateRecordService;
 import com.soft.eva.service.SoftDataService;
+import com.soft.eva.service.SoftwareProductService;
 import com.soft.eva.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,6 +36,11 @@ public class SoftDataController {
     @Autowired
     private MeasurementDataService measurementDataService;
 
+    @Autowired
+    private SoftwareProductService softwareProductService;
+
+    //当前正在测评的软件产品
+    SoftwareProduct softwareProductCurrent;
     String softwareNumber;
 
     List<SoftData> softDataListsInRequirePhase;
@@ -46,6 +52,13 @@ public class SoftDataController {
 //    List<ChartData_SubAttribute> chartData_SubAttributeList = new ArrayList<>();
 
     Chart chart = new Chart();
+
+    public  void getSoftwareProductCurrent(){
+        softwareProductCurrent = softwareProductService.getByStatus(1);
+        if(softwareProductCurrent != null){
+            softwareNumber = softwareProductCurrent.getNumber();
+        }
+    }
 
     public Map<String,Map<String,Double>> getSubAttributeToAttributeKeXinDu(Map<String,List<String>> attributeMap, Map<String,Double> subAttributeKeXinDuMap ){
         Map<String,Map<String,Double>> subAttributeToAttributeKeXinDuMap = new LinkedHashMap<>();
@@ -78,15 +91,28 @@ public class SoftDataController {
     @RequestMapping(value = "/requirePhase/uploadFile",method = RequestMethod.POST)
     @ResponseBody
     public String uploadRequirePhaseFile(@RequestParam("requirePhaseFile")MultipartFile file){
+        getSoftwareProductCurrent();
         String uploadRes = new UploadFile().upload(file);
-        String path = "src/main/resources/static/files/requirePhase.xlsx";
+        if(softwareNumber == null){
+            uploadRes = "请选择某一软件进行测评！";
+            return uploadRes;
+        }
+        String fileName = file.getOriginalFilename();
+        if(fileName.indexOf("\\") != -1){
+            fileName = fileName.substring(fileName.lastIndexOf("\\"));
+        }
+        String path = "src/main/resources/static/files/"+fileName;
         List<SoftData> softDataList = new ReadExcel().getAllData(path);
         try{
             if(softDataList == null){
                 uploadRes = "上传的数据格式有误,请检查单元格y的值是否为0";
             }else{
-                softwareNumber = softDataList.get(0).getSoftwareNumber();
-                softDataService.save(softDataList);
+                String softwareNumberInExcel = softDataList.get(0).getSoftwareNumber();
+                if(!softwareNumber.equals(softwareNumberInExcel)){
+                    uploadRes = "请上传当前测评软件的数据";
+                }else{
+                    softDataService.save(softDataList);
+                }
             }
         }catch (MongoWriteException e){
             return uploadRes = "请检查excel表中是否有重复记录";
@@ -98,7 +124,7 @@ public class SoftDataController {
      * @param limit
      * @param offset
      * @return
-     */
+     *//*
     @ResponseBody
     @RequestMapping(value = "/requirePhase/softDataList",method = RequestMethod.GET)
     public PageUtils softDataListInRequirePhase(@RequestParam(value = "limit", required = false) Integer limit,@RequestParam(value = "offset", required = false) Integer offset,@RequestParam(value = "curSoftwareNumber", required = false) String curSoftwareNumber){
@@ -111,6 +137,29 @@ public class SoftDataController {
         String[] values = {curSoftwareNumber,"需求阶段"};
         page = softDataService.findByPage(fields, values, page);
 //        page = softDataService.findByPage(field,value,page);
+        List<SoftData> softDataList = page.getList();
+        int total = page.getTotalCount();
+        PageUtils pageUtils = new PageUtils(softDataList, total);
+        return pageUtils;
+    }*/
+
+    /**
+     * 需求阶段度量数据
+     * @param limit
+     * @param offset
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/requirePhase/softDataList",method = RequestMethod.GET)
+    public PageUtils softDataListInRequirePhase(@RequestParam(value = "limit", required = false) Integer limit,@RequestParam(value = "offset", required = false) Integer offset){
+        //查询列表数据
+        //因为是服务端分页，返回值必须告诉前端总记录的条数total和当前页的记录数rows
+        getSoftwareProductCurrent();
+
+        Page page = new Page(offset/limit+1, limit);
+        String[] fields = {"softwareNumber","phase"};
+        String[] values = {softwareNumber,"需求阶段"};
+        page = softDataService.findByPage(fields, values, page);
         List<SoftData> softDataList = page.getList();
         int total = page.getTotalCount();
         PageUtils pageUtils = new PageUtils(softDataList, total);
@@ -194,33 +243,19 @@ public class SoftDataController {
     }
 
     /**
-     * 需求阶段 输入正互反矩阵（度量元）
-     * 跳转到输入页面 resMap 是存储度量元的哈希表
+     * 需求阶段 输入正互反矩阵(属性）
      * @param model
      * @return
      */
-    @RequestMapping(value = "/requirePhase/inputMetricElementMatrix",method = RequestMethod.GET)
-    public String showMetricElementInRequirePhase(Model model){
-        Map<String,List<String>> resMap = new FindAll().findAllMetricElementToEachSubAttribute(softDataListsInRequirePhase);
-        model.addAttribute("resMap", resMap);
-        return "/softData/requirePhase/inputMetricElementMatrix";
-    }
-
-    /**
-     * 需求阶段 判断度量元正互反矩阵是否通过一致性检验
-     * @param metricElementMatrixArray
-     * @return
-     */
-    @RequestMapping(value = "/requirePhase/checkCRMetricElement",method = RequestMethod.POST)
-    @ResponseBody
-    public ReturnUtil checkCRMetricElementInRequirePhase(@RequestBody String metricElementMatrixArray){
-        List<String> list = new HandleJsonArray().jsonToArray(metricElementMatrixArray);
+    @RequestMapping(value = "/requirePhase/inputAttributeMatrix",method = RequestMethod.GET)
+    public String showAttributeInRequirePhase(Model model){
 //        List<SoftData> softDataList = softDataService.find("phase","需求阶段");
-        Map<String,Double> metricElementWeightMap = new CountWeight().countWeight_MetricElement(list, softDataListsInRequirePhase);
-        if(metricElementWeightMap == null){
-            return ReturnUtil.error(1, "度量元正互反矩阵没有通过一致性检验");
-        }
-        return ReturnUtil.ok();
+        String[] fields = {"softwareNumber","phase"};
+        String[] values = {softwareNumber,"需求阶段"};
+        softDataListsInRequirePhase = softDataService.find(fields,values);
+        Map<String,List<String>> resMap = new FindAll().findAllAttributeToEachPhase(softDataListsInRequirePhase);
+        model.addAttribute("resMap", resMap);
+        return "/softData/requirePhase/inputAttributeMatrix";
     }
 
     /**
@@ -238,17 +273,16 @@ public class SoftDataController {
     }
 
     /**
-     * 需求阶段 输入正互反矩阵(属性）
+     * 需求阶段 输入正互反矩阵（度量元）
+     * 跳转到输入页面 resMap 是存储度量元的哈希表
      * @param model
      * @return
      */
-    @RequestMapping(value = "/requirePhase/inputAttributeMatrix",method = RequestMethod.GET)
-    public String showAttributeInRequirePhase(Model model){
-//        List<SoftData> softDataList = softDataService.find("phase","需求阶段");
-        softDataListsInRequirePhase = softDataService.find("phase", "需求阶段");
-        Map<String,List<String>> resMap = new FindAll().findAllAttributeToEachPhase(softDataListsInRequirePhase);
+    @RequestMapping(value = "/requirePhase/inputMetricElementMatrix",method = RequestMethod.GET)
+    public String showMetricElementInRequirePhase(Model model){
+        Map<String,List<String>> resMap = new FindAll().findAllMetricElementToEachSubAttribute(softDataListsInRequirePhase);
         model.addAttribute("resMap", resMap);
-        return "/softData/requirePhase/inputAttributeMatrix";
+        return "/softData/requirePhase/inputMetricElementMatrix";
     }
 
     /**
@@ -310,8 +344,6 @@ public class SoftDataController {
             matrixListsInRequirePhase.set(2, attributeMatrixList);
         }
 //        List<SoftData> softDataList = softDataService.find("phase","需求阶段");
-
-
         Map<String,Double> metricElementWeightMap = new CountWeight().countWeight_MetricElement(metricElementMatrixList, softDataListsInRequirePhase);
         Map<String,Double> subAttributeWeightMap = new CountWeight().countWeight_SubAttribute(subAttributeMatrixList, softDataListsInRequirePhase);
         Map<String,Double> attributeWeightMap = new CountWeight().countWeight_Attribute(attributeMatrixList, softDataListsInRequirePhase);
@@ -340,6 +372,7 @@ public class SoftDataController {
     @RequestMapping(value = "/requirePhase/countKeXinDuInRequirePhase",method = RequestMethod.GET)
     public String countKeXinDuInRequirePhase(Model model){
 //        List<SoftData> softDataList = softDataService.find("phase","需求阶段");
+
         if(softDataListsInRequirePhase != null && matrixListsInRequirePhase.size() != 0){
             softwareNumber = softDataListsInRequirePhase.get(0).getSoftwareNumber();
             Map<String,List<String>> subAttributeMap = new FindAll().findAllMetricElementToEachSubAttribute(softDataListsInRequirePhase);
@@ -392,7 +425,7 @@ public class SoftDataController {
     /**
      * 设计阶段
      * @return
-     */
+     *//*
     @RequestMapping(value = "/designPhase",method = RequestMethod.GET)
     public String softDataInputInDesignPhase(){
         return "softData/designPhase/softDataList";
@@ -410,6 +443,44 @@ public class SoftDataController {
             softDataService.save(softDataList);
         }
         return uploadRes;
+    }*/
+
+    /**
+     * 设计阶段
+     * @return
+     */
+    @RequestMapping(value = "/designPhase",method = RequestMethod.GET)
+    public String softDataInputInDesignPhase(){
+        return "softData/designPhase/softDataList";
+    }
+
+    @RequestMapping(value = "/designPhase/uploadFile",method = RequestMethod.POST)
+    @ResponseBody
+    public String uploadDesignPhaseFile(@RequestParam("designPhaseFile")MultipartFile file){
+        getSoftwareProductCurrent();
+
+        String uploadRes = new UploadFile().upload(file);
+        if(softwareNumber == null){
+            uploadRes = "请选择某一软件进行测评！";
+            return uploadRes;
+        }
+        String fileName = file.getOriginalFilename();
+        if(fileName.indexOf("\\") != -1){
+            fileName = fileName.substring(fileName.lastIndexOf("\\"));
+        }
+        String path = "src/main/resources/static/files/"+fileName;
+        List<SoftData> softDataList = new ReadExcel().getAllData(path);
+        if(softDataList == null){
+            uploadRes = "上传的数据格式有误,请检查单元格内容是否有空值或者y的值是否为0";
+        }else{
+            String softwareNumberInExcel = softDataList.get(0).getSoftwareNumber();
+            if(!softwareNumber.equals(softwareNumberInExcel)){
+                uploadRes = "请上传当前测评软件的数据";
+            }else{
+                softDataService.save(softDataList);
+            }
+        }
+        return uploadRes;
     }
 
     /**
@@ -423,11 +494,16 @@ public class SoftDataController {
     public PageUtils softDataListInDesignPhase(@RequestParam(value = "limit", required = false) Integer limit,@RequestParam(value = "offset", required = false) Integer offset){
         //查询列表数据
         //因为是服务端分页，返回值必须告诉前端总记录的条数total和当前页的记录数rows
+        getSoftwareProductCurrent();
+
         Page page = new Page(offset/limit+1, limit);
-//        page = softDataService.findByPage(page);
-        String field = "phase";
-        String value = "设计阶段";
-        page = softDataService.findByPage(field,value,page);
+//        String field = "phase";
+//        String value = "设计阶段";
+//        page = softDataService.findByPage(field,value,page);
+        String[] fields = {"softwareNumber","phase"};
+        String[] values = {softwareNumber,"设计阶段"};
+        page = softDataService.findByPage(fields, values, page);
+
         List<SoftData> softDataList = page.getList();
         int total = page.getTotalCount();
         PageUtils pageUtils = new PageUtils(softDataList, total);
@@ -457,13 +533,13 @@ public class SoftDataController {
 
     /**
      * 设计阶段 编辑度量数据 跳转到编辑页面
-     * @param id
+     * @param editId
      * @param model
      * @return
      */
-    @RequestMapping(value = "/designPhase/edit/{id}",method = RequestMethod.GET)
-    public String editSoftDataInDesignPhase(@PathVariable("id") String id, Model model){
-        SoftData softData = softDataService.findById(id);
+    @RequestMapping(value = "/designPhase/edit/{editId}",method = RequestMethod.GET)
+    public String editSoftDataInDesignPhase(@PathVariable("editId") String editId, Model model){
+        SoftData softData = softDataService.findById(editId);
         model.addAttribute("softData", softData);
         return "/softData/designPhase/edit";
     }
@@ -482,13 +558,13 @@ public class SoftDataController {
 
     /**
      * 设计阶段 删除度量数据
-     * @param id
+     * @param removeId
      * @return
      */
     @ResponseBody
     @RequestMapping(value = "/designPhase/remove",method = RequestMethod.POST)
-    public ReturnUtil removeSoftDataInDesignPhase(String id){
-        softDataService.deleteById(id);
+    public ReturnUtil removeSoftDataInDesignPhase(String removeId){
+        softDataService.deleteById(removeId);
         return ReturnUtil.ok();
     }
 
@@ -505,55 +581,19 @@ public class SoftDataController {
     }
 
     /**
-     * 设计阶段 修改正互反矩阵，跳到上传凭证说明页面
-     * @return
-     *//*
-    @RequestMapping(value = "/designPhase/upload",method = RequestMethod.GET)
-    public String changeAttributeMatrixInDesignPhase(){
-        return "softData/designPhase/upload";
-    }
-
-    *//**
-     * 设计阶段 提交凭证说明
-     * @param softData
-     * @return
-     *//*
-    @ResponseBody
-    @RequestMapping(value = "/designPhase/submit",method = RequestMethod.POST)
-    public ReturnUtil submitProofInDesignPhase(SoftData softData){
-        softDataService.save(softData);
-        return ReturnUtil.ok();
-    }*/
-
-    /**
-     * 设计阶段 输入正互反矩阵（度量元）
-     * 跳转到输入页面 resMap 是存储度量元的哈希表
+     * 设计阶段 输入正互反矩阵(属性）
      * @param model
      * @return
      */
-    @RequestMapping(value = "/designPhase/inputMetricElementMatrix",method = RequestMethod.GET)
-    public String showMetricElementInDesignPhase(Model model){
+    @RequestMapping(value = "/designPhase/inputAttributeMatrix",method = RequestMethod.GET)
+    public String showAttributeInDesignPhase(Model model){
 //        List<SoftData> softDataList = softDataService.find(field,value);
-        Map<String,List<String>> resMap = new FindAll().findAllMetricElementToEachSubAttribute(softDataListsInDesignPhase);
+        String[] fields = {"softwareNumber","phase"};
+        String[] values = {softwareNumber,"设计阶段"};
+        softDataListsInDesignPhase = softDataService.find(fields,values);
+        Map<String,List<String>> resMap = new FindAll().findAllAttributeToEachPhase(softDataListsInDesignPhase);
         model.addAttribute("resMap", resMap);
-        return "/softData/designPhase/inputMetricElementMatrix";
-    }
-
-    /**
-     * 设计阶段 判断度量元正互反矩阵是否通过一致性检验
-     * @param metricElementMatrixArray
-     * @return
-     */
-    @RequestMapping(value = "/designPhase/checkCRMetricElement",method = RequestMethod.POST)
-    @ResponseBody
-    public ReturnUtil checkCRMetricElementInDesignPhase(@RequestBody String metricElementMatrixArray){
-        List<String> list = new HandleJsonArray().jsonToArray(metricElementMatrixArray);
-//        List<SoftData> softDataList = softDataService.find(field,value);
-        Map<String,Double> metricElementWeightMap = new CountWeight().countWeight_MetricElement(list, softDataListsInDesignPhase);
-        if(metricElementWeightMap == null){
-            return ReturnUtil.error(1, "度量元正互反矩阵没有通过一致性检验");
-        }
-        return ReturnUtil.ok();
+        return "/softData/designPhase/inputAttributeMatrix";
     }
 
     /**
@@ -571,18 +611,19 @@ public class SoftDataController {
     }
 
     /**
-     * 设计阶段 输入正互反矩阵(属性）
+     * 设计阶段 输入正互反矩阵（度量元）
+     * 跳转到输入页面 resMap 是存储度量元的哈希表
      * @param model
      * @return
      */
-    @RequestMapping(value = "/designPhase/inputAttributeMatrix",method = RequestMethod.GET)
-    public String showAttributeInDesignPhase(Model model){
+    @RequestMapping(value = "/designPhase/inputMetricElementMatrix",method = RequestMethod.GET)
+    public String showMetricElementInDesignPhase(Model model){
 //        List<SoftData> softDataList = softDataService.find(field,value);
-        softDataListsInDesignPhase = softDataService.find("phase", "设计阶段");
-        Map<String,List<String>> resMap = new FindAll().findAllAttributeToEachPhase(softDataListsInDesignPhase);
+        Map<String,List<String>> resMap = new FindAll().findAllMetricElementToEachSubAttribute(softDataListsInDesignPhase);
         model.addAttribute("resMap", resMap);
-        return "/softData/designPhase/inputAttributeMatrix";
+        return "/softData/designPhase/inputMetricElementMatrix";
     }
+
 
     /**
      * 设计阶段 根据度量元，子属性，属性的正互反矩阵分别计算权重
@@ -742,13 +783,28 @@ public class SoftDataController {
     @RequestMapping(value = "/codingPhase/uploadFile",method = RequestMethod.POST)
     @ResponseBody
     public String uploadCodingPhaseFile(@RequestParam("codingPhaseFile")MultipartFile file){
+        getSoftwareProductCurrent();
+
         String uploadRes = new UploadFile().upload(file);
-        String path = "src/main/resources/static/files/codingPhase.xlsx";
+        if(softwareNumber == null){
+            uploadRes = "请选择某一软件进行测评！";
+            return uploadRes;
+        }
+        String fileName = file.getOriginalFilename();
+        if(fileName.indexOf("\\") != -1){
+            fileName = fileName.substring(fileName.lastIndexOf("\\"));
+        }
+        String path = "src/main/resources/static/files/"+fileName;
         List<SoftData> softDataList = new ReadExcel().getAllData(path);
         if(softDataList == null){
             uploadRes = "上传的数据格式有误,请检查是否有空值或者y的值是否为0";
         }else{
-            softDataService.save(softDataList);
+            String softwareNumberInExcel = softDataList.get(0).getSoftwareNumber();
+            if(!softwareNumber.equals(softwareNumberInExcel)){
+                uploadRes = "请上传当前测评软件的数据";
+            }else{
+                softDataService.save(softDataList);
+            }
         }
         return uploadRes;
     }
@@ -764,10 +820,16 @@ public class SoftDataController {
     public PageUtils softDataListInCodingPhase(@RequestParam(value = "limit", required = false) Integer limit,@RequestParam(value = "offset", required = false) Integer offset){
         //查询列表数据
         //因为是服务端分页，返回值必须告诉前端总记录的条数total和当前页的记录数rows
+        getSoftwareProductCurrent();
+
         Page page = new Page(offset/limit+1, limit);
-        String field = "phase";
-        String value = "编码阶段";
-        page = softDataService.findByPage(field,value,page);
+//        String field = "phase";
+//        String value = "编码阶段";
+//        page = softDataService.findByPage(field,value,page);
+        String[] fields = {"softwareNumber","phase"};
+        String[] values = {softwareNumber,"编码阶段"};
+        page = softDataService.findByPage(fields, values, page);
+
         List<SoftData> softDataList = page.getList();
         int total = page.getTotalCount();
         PageUtils pageUtils = new PageUtils(softDataList, total);
@@ -845,17 +907,19 @@ public class SoftDataController {
     }
 
     /**
-     * 编码阶段 输入正互反矩阵（度量元）
-     * 跳转到输入页面 resMap 是存储度量元的哈希表
+     * 编码阶段 输入正互反矩阵(属性）
      * @param model
      * @return
      */
-    @RequestMapping(value = "/codingPhase/inputMetricElementMatrix",method = RequestMethod.GET)
-    public String showMetricElementInCodingPhase(Model model){
+    @RequestMapping(value = "/codingPhase/inputAttributeMatrix",method = RequestMethod.GET)
+    public String showAttributeInCodingPhase(Model model){
 //        List<SoftData> softDataList = softDataService.find(field,value);
-        Map<String,List<String>> resMap = new FindAll().findAllMetricElementToEachSubAttribute(softDataListsInCodingPhase);
+        String[] fields = {"softwareNumber","phase"};
+        String[] values = {softwareNumber,"编码阶段"};
+        softDataListsInCodingPhase = softDataService.find(fields, values);
+        Map<String,List<String>> resMap = new FindAll().findAllAttributeToEachPhase(softDataListsInCodingPhase);
         model.addAttribute("resMap", resMap);
-        return "/softData/codingPhase/inputMetricElementMatrix";
+        return "/softData/codingPhase/inputAttributeMatrix";
     }
 
     /**
@@ -873,21 +937,22 @@ public class SoftDataController {
     }
 
     /**
-     * 设计阶段 输入正互反矩阵(属性）
+     * 编码阶段 输入正互反矩阵（度量元）
+     * 跳转到输入页面 resMap 是存储度量元的哈希表
      * @param model
      * @return
      */
-    @RequestMapping(value = "/codingPhase/inputAttributeMatrix",method = RequestMethod.GET)
-    public String showAttributeInCodingPhase(Model model){
+    @RequestMapping(value = "/codingPhase/inputMetricElementMatrix",method = RequestMethod.GET)
+    public String showMetricElementInCodingPhase(Model model){
 //        List<SoftData> softDataList = softDataService.find(field,value);
-        softDataListsInCodingPhase = softDataService.find("phase", "编码阶段");
-        Map<String,List<String>> resMap = new FindAll().findAllAttributeToEachPhase(softDataListsInCodingPhase);
+        Map<String,List<String>> resMap = new FindAll().findAllMetricElementToEachSubAttribute(softDataListsInCodingPhase);
         model.addAttribute("resMap", resMap);
-        return "/softData/codingPhase/inputAttributeMatrix";
+        return "/softData/codingPhase/inputMetricElementMatrix";
     }
 
+
     /**
-     * 设计阶段 根据度量元，子属性，属性的正互反矩阵分别计算权重
+     * 编码阶段 根据度量元，子属性，属性的正互反矩阵分别计算权重
      * @param zhenghufanMatrix
      * @return
      */
@@ -924,7 +989,7 @@ public class SoftDataController {
     }
 
     /**
-     * 设计阶段 显示所有的权重
+     * 编码阶段 显示所有的权重
      * @return
      */
     @RequestMapping(value = "/codingPhase/displayWeight",method = RequestMethod.GET)
@@ -1040,13 +1105,28 @@ public class SoftDataController {
     @RequestMapping(value = "/testPhase/uploadFile",method = RequestMethod.POST)
     @ResponseBody
     public String uploadTestPhaseFile(@RequestParam("testPhaseFile") MultipartFile file){
+        getSoftwareProductCurrent();
+
         String uploadRes = new UploadFile().upload(file);
-        String path = "src/main/resources/static/files/testPhase.xlsx";
+        if(softwareNumber == null){
+            uploadRes = "请选择某一软件进行测评！";
+            return uploadRes;
+        }
+        String fileName = file.getOriginalFilename();
+        if(fileName.indexOf("\\") != -1){
+            fileName = fileName.substring(fileName.lastIndexOf("\\"));
+        }
+        String path = "src/main/resources/static/files/"+fileName;
         List<SoftData> softDataList = new ReadExcel().getAllData(path);
         if(softDataList == null){
             uploadRes = "上传的数据格式有误,请检查单元格内容是否有空值或者y的值是否为0";
         }else{
-            softDataService.save(softDataList);
+            String softwareNumberInExcel = softDataList.get(0).getSoftwareNumber();
+            if(!softwareNumber.equals(softwareNumberInExcel)){
+                uploadRes = "请上传当前测评软件的数据";
+            }else{
+                softDataService.save(softDataList);
+            }
         }
         return uploadRes;
     }
@@ -1062,11 +1142,17 @@ public class SoftDataController {
     public PageUtils softDataListInTestPhase(@RequestParam(value = "limit", required = false) Integer limit, @RequestParam(value = "offset", required = false) Integer offset){
         //查询列表数据
         //因为是服务端分页，返回值必须告诉前端总记录的条数total和当前页的记录数rows
+        getSoftwareProductCurrent();
+
         Page page = new Page(offset/limit+1, limit);
 //        page = softDataService.findByPage(page);
-        String field = "phase";
-        String value = "测试阶段";
-        page = softDataService.findByPage(field,value,page);
+//        String field = "phase";
+//        String value = "测试阶段";
+//        page = softDataService.findByPage(field,value,page);
+        String[] fields = {"softwareNumber","phase"};
+        String[] values = {softwareNumber,"测试阶段"};
+        page = softDataService.findByPage(fields, values, page);
+
         List<SoftData> softDataList = page.getList();
         int total = page.getTotalCount();
         PageUtils pageUtils = new PageUtils(softDataList, total);
@@ -1143,18 +1229,22 @@ public class SoftDataController {
         return ReturnUtil.ok();
     }
 
+
+
     /**
-     * 测试阶段 输入正互反矩阵（度量元）
-     * 跳转到输入页面 resMap 是存储度量元的哈希表
+     * 测试阶段 输入正互反矩阵(属性）
      * @param model
      * @return
      */
-    @RequestMapping(value = "/testPhase/inputMetricElementMatrix",method = RequestMethod.GET)
-    public String showMetricElementInTestPhase(Model model){
+    @RequestMapping(value = "/testPhase/inputAttributeMatrix",method = RequestMethod.GET)
+    public String showAttributeInTestPhase(Model model){
 //        List<SoftData> softDataList = softDataService.find(field,value);
-        Map<String,List<String>> resMap = new FindAll().findAllMetricElementToEachSubAttribute(softDataListsInTestPhase);
+        String[] fields = {"softwareNumber","phase"};
+        String[] values = {softwareNumber,"测试阶段"};
+        softDataListsInTestPhase = softDataService.find(fields, values);
+        Map<String,List<String>> resMap = new FindAll().findAllAttributeToEachPhase(softDataListsInTestPhase);
         model.addAttribute("resMap", resMap);
-        return "/softData/testPhase/inputMetricElementMatrix";
+        return "/softData/testPhase/inputAttributeMatrix";
     }
 
     /**
@@ -1172,17 +1262,17 @@ public class SoftDataController {
     }
 
     /**
-     * 测试阶段 输入正互反矩阵(属性）
+     * 测试阶段 输入正互反矩阵（度量元）
+     * 跳转到输入页面 resMap 是存储度量元的哈希表
      * @param model
      * @return
      */
-    @RequestMapping(value = "/testPhase/inputAttributeMatrix",method = RequestMethod.GET)
-    public String showAttributeInTestPhase(Model model){
+    @RequestMapping(value = "/testPhase/inputMetricElementMatrix",method = RequestMethod.GET)
+    public String showMetricElementInTestPhase(Model model){
 //        List<SoftData> softDataList = softDataService.find(field,value);
-        softDataListsInTestPhase = softDataService.find("phase", "测试阶段");
-        Map<String,List<String>> resMap = new FindAll().findAllAttributeToEachPhase(softDataListsInTestPhase);
+        Map<String,List<String>> resMap = new FindAll().findAllMetricElementToEachSubAttribute(softDataListsInTestPhase);
         model.addAttribute("resMap", resMap);
-        return "/softData/testPhase/inputAttributeMatrix";
+        return "/softData/testPhase/inputMetricElementMatrix";
     }
 
     /**

@@ -8,7 +8,7 @@
 <p>度量元正互反矩阵</p>
 <form>
     <div th:each="map : ${resMap}">
-        <table class="table table-bordered">
+        <table class="table table-bordered" id="matrix">
             <caption th:text="${map.key}"></caption>
             <thead>
             <tr>
@@ -21,7 +21,7 @@
                 <td th:text="${metricElement}"></td>
                 <td th:each="metricElement : ${map.value}"><input type="text" name="metricElementMatrixArrayInDesignPhase[]"
                                                                   id="metricElementMatrixArrayInDesignPhase"
-                                                                  value="1"/>
+                                                                  value="1" disabled="true"/>
                 </td>
             </tr>
             </tbody>
@@ -29,6 +29,9 @@
     </div>
     <div class="form-group">
         <div class="col-sm-8 col-sm-offset-3">
+            <button type="button" class="btn btn-primary" onclick="change()">
+                <i class="fa fa-edit" aria-hidden="true"></i>修改
+            </button>
             <input type="button" class="btn btn-success" id="saveData" th:value="保存数据"/>
             <input type="button" class="btn btn-primary" id="submitData" th:value="提交"/>
 

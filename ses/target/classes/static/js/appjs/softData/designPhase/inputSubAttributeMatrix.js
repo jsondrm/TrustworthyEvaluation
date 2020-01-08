@@ -1,6 +1,21 @@
 //①先将数组的值存入localstorage
 var subAttributeMatrixArray = document.getElementsByName("subAttributeMatrixArrayInDesignPhase[]");
+var currentUser = localStorage.getItem("currentUsername");
 
+function change(){
+    if(currentUser != "admin"){
+        alert("请联系管理员进行修改！");
+    }else{
+        layer.open({
+            type: 2,
+            title: '操作记录添加',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '400px'],
+            content: "/operateRecord" + '/upload' // iframe的url
+        });
+    }
+}
 function saveArray() {
     var arrayNew = [];
     for (var i = 0; i < subAttributeMatrixArray.length; i++) {

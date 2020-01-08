@@ -9,7 +9,7 @@
     <h3>属性正互反判断矩阵</h3>
     <form class="form-horizontal m-t">
         <div th:each="map : ${resMap}">
-            <table class="table table-bordered">
+            <table class="table table-bordered" id="matrix">
                 <caption th:text="${map.key}+'的属性正互反判断矩阵'"></caption>
                 <thead>
                 <tr>
@@ -21,7 +21,7 @@
                 <tr th:each="attribute : ${map.value}">
                     <td th:text="${attribute}"></td>
                     <td th:each="attribute : ${map.value}"><input type="text" name="attributeMatrixArrayInRequirePhase[]" id="attributeMatrixArrayInRequirePhase"
-                                                                     value="1"/>
+                                                                     value="1" disabled="true"/>
                     </td>
                 </tr>
                 </tbody>
@@ -53,7 +53,7 @@
         }else{
             layer.open({
                 type: 2,
-                title: '原始凭证上传',
+                title: '操作记录添加',
                 maxmin: true,
                 shadeClose: false, // 点击遮罩关闭层
                 area: ['800px', '400px'],

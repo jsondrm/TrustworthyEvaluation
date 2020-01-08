@@ -55,6 +55,7 @@
     <insert id="save" parameterType="com.soft.eva.domain.User" useGeneratedKeys="true" keyProperty="userId">
 		insert into sys_user
 		(
+			`userId`,
 			`username`,
 			`password`,
 			`dptName`,
@@ -65,6 +66,7 @@
 		)
 		values
 		(
+			#{userId},
 			#{username},
 			#{password},
 			#{dptName},

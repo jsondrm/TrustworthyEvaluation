@@ -38,11 +38,12 @@ function load() {
         columns: [
             {
                 checkbox: true,
-                title:"全选"
+                title:'全选'
             },
             {
                 field: 'id',
-                title: '编号'
+                title: '编号',
+                visible: false
             },
             {
                 field: 'operateTime',

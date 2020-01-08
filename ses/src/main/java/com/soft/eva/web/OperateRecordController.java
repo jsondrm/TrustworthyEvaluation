@@ -57,12 +57,22 @@ public class OperateRecordController {
     }
 
     /**
-     *  修改正互反矩阵，跳到上传凭证说明页面
+     *  修改正互反矩阵，跳到操作记录说明填写页面
      * @return
      */
     @RequestMapping(value = "/upload",method = RequestMethod.GET)
-    public String changeAttributeMatrixInDesignPhase(){
-        return "operateRecord/designPhase/upload";
+    public String changeAttributeMatrix(){
+        return "operateRecord/uploadOperateRecordModifyMatrix";
+    }
+
+    /**
+     * 四个阶段
+     * 点击添加操作记录，再执行具体操作
+     * @return
+     */
+    @RequestMapping(value = "/uploadOperateRecord",method = RequestMethod.GET)
+    public String uploadOperateRecordInRequirePhase(){
+        return "operateRecord/uploadOperateRecord";
     }
 
     /**

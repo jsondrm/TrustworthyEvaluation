@@ -10,6 +10,10 @@ import java.util.Map;
 public interface SoftwareProductService {
     SoftwareProduct get(String number);
 
+    SoftwareProduct getByStatus(int status);
+
+    List<SoftwareProduct> findAll();
+
     List<SoftwareProduct> list(Map<String, Object> map);
 
     int count(Map<String, Object> map);

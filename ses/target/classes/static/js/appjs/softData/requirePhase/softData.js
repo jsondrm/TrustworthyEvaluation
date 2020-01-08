@@ -1,34 +1,16 @@
 var prefix = "/softData/requirePhase";
+currentUser = localStorage.getItem("currentUsername");
 $(function () {
+    if(currentUser != "admin"){
+        var uploadButton = document.getElementById("uploadFile");
+        uploadButton.setAttribute("disabled",true);
+        var buttons = document.getElementsByTagName("button");
+        for(var i = 0; i < buttons.length; i++){
+            buttons[i].setAttribute("disabled", true)
+        }
+    }
     load();
 });
-
-/*function selectLoad() {
-    var html = "";
-    $.ajax({
-        url : '/softData/requirePhase/type',
-        success : function (data) {
-            //加载数据
-            for(var i = 0; i < data.length; i++){
-                html += '<option value="' + data[i].type + '">' + data[i].description + '</option>'
-            }
-            $(".chosen-select").append(html);
-            $(".chosen-select").chosen({
-                maxHeight : 200
-            });
-            //点击事件
-            $('.chosen-select').on('change',function (e, params) {
-                console.log(params.selected);
-                var opt = {
-                    query : {
-                        type : params.selected,
-                    }
-                }
-                $('#exampleTable').bootstrapTable('refresh', opt);
-            });
-        }
-    });
-}*/
 function load() {
     // selectLoad();
     $('#exampleTable').bootstrapTable('destroy');
@@ -52,9 +34,9 @@ function load() {
             //这里键的名字和控制器的变量名必须一致，这边改动，控制器也要改成一样的
             return {
                 limit: params.limit, //页面大小
-                offset: params.offset, //页码
-                curSoftwareNumber : localStorage.getItem('curSoftwareNumberEvaluating')
-                //pageNumber : params.pageNumber
+                offset: params.offset //页码
+                // curSoftwareNumber : localStorage.getItem('curSoftwareNumberEvaluating')
+
             };
         },
         ////请求服务器数据时，你可以通过重写参数的方式添加一些额外的参数，例如 toolbar 中的参数 如果
@@ -124,12 +106,15 @@ function load() {
                 field: 'id',
                 align: 'center',
                 formatter: function (value, row, index) {
-                    var e = '<a class="btn btn-primary btn-sm" href="#" mce_href="#" title="编辑" onclick="edit(\''
+                    /*var e = '<a class="btn btn-primary btn-sm"  mce_href="#" title="编辑" id="editButton" disabled="true" onclick="edit(\''
                         + row.id
-                        + '\')"><i class="fa fa-edit"></i></a>';
-                    var d = '<a class="btn btn-warning btn-sm" href="#" title="删除" mce_href="#" onclick="remove(\''
+                        + '\')"><i class="fa fa-edit"></i></a>';*/
+                    var e = '<button class="btn btn-primary btn-sm " title="编辑" id="editButton" disabled="true" onclick="edit(\''
                         + row.id
-                        + '\')"><i class="fa fa-remove"></i></a>';
+                        + '\')"><i class="fa fa-edit"></i></button>';
+                    var d = '<button class="btn btn-warning btn-sm" title="删除" id="removeButton" disabled="true" onclick="remove(\''
+                        + row.id
+                        + '\')"><i class="fa fa-remove"></i></button>';
                     return e + d;
                 }
             }
@@ -172,7 +157,7 @@ $("#uploadFile").click(function () {
             window.location.href = "/softData/requirePhase";
         }
     });
-})
+});
 
 //查询
 function reLoad() {
@@ -185,51 +170,80 @@ function reLoad() {
 
 }
 
+function uploadOperateRecord(){
+    if(currentUser != "admin"){
+        alert("请联系管理员进行添加！");
+    }else{
+        layer.open({
+            type: 2,
+            title: '操作记录说明',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '400px'],
+            content: "/operateRecord/uploadOperateRecord" // iframe的url
+        });
+    }
+}
+
 //添加
 function add() {
-    layer.open({
-        type: 2,
-        title: '增加度量指标',
-        maxmin: true,
-        shadeClose: false, // 点击遮罩关闭层
-        area: ['800px', '600px'],
-        content: prefix + '/add' // iframe的url
-    });
+    if(currentUser != "admin"){
+        alert("请联系管理员进行增加！");
+    }else{
+        layer.open({
+            type: 2,
+            title: '增加度量指标',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '600px'],
+            content: prefix + '/add' // iframe的url
+        });
+    }
 }
 
 //编辑
 function edit(id) {
-    layer.open({
-        type: 2,
-        title: '编辑度量指标',
-        maxmin: true,
-        shadeClose: false, // 点击遮罩关闭层
-        area: ['800px', '600px'],
-        content: prefix + '/edit/' + id // iframe的url
-    });
+    if(currentUser != "admin"){
+        alert("请联系管理员进行编辑！");
+    }else{
+        layer.open({
+            type: 2,
+            title: '编辑度量指标',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '600px'],
+            content: prefix + '/edit/' + id // iframe的url
+        });
+    }
+
 }
 
 //删除
 function remove(id) {
-    layer.confirm('确定要删除选中的记录？', {
-        btn: ['确定', '取消']
-    }, function () {
-        $.ajax({
-            url: prefix + "/remove",
-            type: "post",
-            data: {
-                'id': id
-            },
-            success: function (r) {
-                if (r.code == 0) {
-                    layer.msg(r.msg);
-                    reLoad();
-                } else {
-                    layer.msg(r.msg);
+    if(currentUser != "admin"){
+        alert("请联系管理员进行删除！");
+    }else{
+        layer.confirm('确定要删除选中的记录？', {
+            btn: ['确定', '取消']
+        }, function () {
+            $.ajax({
+                url: prefix + "/remove",
+                type: "post",
+                data: {
+                    'id': id
+                },
+                success: function (r) {
+                    if (r.code == 0) {
+                        layer.msg(r.msg);
+                        reLoad();
+                    } else {
+                        layer.msg(r.msg);
+                    }
                 }
-            }
-        });
-    })
+            });
+        })
+    }
+
 }
 
 

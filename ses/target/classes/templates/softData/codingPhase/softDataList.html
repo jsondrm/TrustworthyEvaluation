@@ -13,21 +13,16 @@
         <div class="ibox-body">
             <div class="fixed-table-toolbar">
                 <div id="exampleToolbar" class="columns pull-left">
-                    <button type="button" class="btn btn-primary" onclick="add()">
+                    <button type="button" class="btn btn-primary" disabled="true" onclick="add()">
                         <i class="fa fa-plus" aria-hidden="true"></i>添加
                     </button>
-                    <button type="button" class="btn btn-danger" onclick="batchRemove()">
+                    <button type="button" class="btn btn-danger" disabled="true" onclick="batchRemove()">
                         <i class="fa fa-trash" aria-hidden="true"></i>批量删除
                     </button>
                 </div>
-                <!--<div class="columns pull-right">
-                    <button class="btn btn-success" onclick="reLoad()">查询</button>
+                <div class="columns pull-right">
+                    <button class="btn btn-success" onclick="uploadOperateRecord()">操作记录添加</button>
                 </div>
-                <div class="columns pull-right col-md-2 nopadding">
-                    <select data-placeholder="选择属性" class="form-control chosen-select" tabindex="2" style="...">
-                        <option value="">选择属性</option>
-                    </select>
-                </div>-->
             </div>
             <table id="exampleTable" data-mobile-responsive="true"></table>
         </div>

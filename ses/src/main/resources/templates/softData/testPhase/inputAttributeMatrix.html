@@ -9,7 +9,7 @@
     <p>属性正互反矩阵</p>
     <form class="form-horizontal m-t">
         <div th:each="map : ${resMap}">
-            <table class="table table-bordered">
+            <table class="table table-bordered" id="matrix">
                 <caption th:text="${map.key}"></caption>
                 <thead>
                 <tr>
@@ -21,7 +21,7 @@
                 <tr th:each="attribute : ${map.value}">
                     <td th:text="${attribute}"></td>
                     <td th:each="attribute : ${map.value}"><input type="text" name="attributeMatrixArrayInTestPhase[]" id="attributeMatrixArrayInTestPhase"
-                                                                     value="1"/>
+                                                                     value="1" disabled="true"/>
                     </td>
                 </tr>
                 </tbody>

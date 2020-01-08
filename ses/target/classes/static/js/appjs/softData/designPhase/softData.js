@@ -1,7 +1,12 @@
 var prefix = "/softData/designPhase";
 currentUser = localStorage.getItem("currentUsername");
+editId = localStorage.getItem("editId");
+removeId = localStorage.getItem("removeId");
+rows = localStorage.getItem("rows");
 $(function () {
-    if(currentUser != "hewenxuan"){
+    if(currentUser != "admin"){
+        var uploadButton = document.getElementById("uploadFile");
+        uploadButton.setAttribute("disabled",true);
         var buttons = document.getElementsByTagName("button");
         for(var i = 0; i < buttons.length; i++){
             buttons[i].setAttribute("disabled", true)
@@ -29,20 +34,11 @@ function load() {
         showColumns: false, //是否显示内容下拉框
         sidePagination: "server", //设置在哪里进行分页 可选择 服务器端或者客户端
         queryParams: function (params) {
-            //传入后台的参数包括offset开始索引，limit步长，sort排序列，order：desc，以及所有列的键值对
-            //这里键的名字和控制器的变量名必须一致，这边改动，控制器也要改成一样的
             return {
                 limit: params.limit, //页面大小
                 offset: params.offset //页码
-                //pageNumber : params.pageNumber
             };
         },
-        ////请求服务器数据时，你可以通过重写参数的方式添加一些额外的参数，例如 toolbar 中的参数 如果
-        // 				// queryParamsType = 'limit' ,返回参数必须包含
-        // 				// limit, offset, search, sort, order 否则, 需要包含:
-        // 				// pageSize, pageNumber, searchText, sortName,
-        // 				// sortOrder.
-        // 				// 返回false将会终止请求
         columns: [
             {
                 checkbox: true
@@ -106,33 +102,19 @@ function load() {
                 align: 'center',
                 //width : '200px',
                 formatter: function (value, row, index) {
-                    var e = '<a class="btn btn-primary btn-sm" href="#" mce_href="#" title="编辑" onclick="edit(\''
+                    var e = '<a class="btn btn-primary btn-sm" href="#" mce_href="#" id="editButton" disabled="true" title="编辑" onclick="edit(\''
                         + row.id
                         + '\')"><i class="fa fa-edit"></i></a>';
-                    var d = '<a class="btn btn-warning btn-sm" href="#" title="删除" mce_href="#" onclick="remove(\''
+                    var d = '<a class="btn btn-warning btn-sm" href="#" title="删除" mce_href="#" id="removeButton" disabled="true" onclick="remove(\''
                         + row.id
                         + '\')"><i class="fa fa-remove"></i></a>';
-                   /* var e1 = '<a class="btn btn-primary btn-sm" href="#" mce_href="#" title="编辑" disabled="true" onclick="edit(\''
-                        + row.id
-                        + '\')"><i class="fa fa-edit"></i></a>';
-                    var d1 = '<a class="btn btn-warning btn-sm" href="#" title="删除"  disabled="true" mce_href="#" onclick="remove(\''
-                        + row.id
-                        + '\')"><i class="fa fa-remove"></i></a>';*/
                     return e + d;
-
-                    /*var currentUser = localStorage.getItem("currentUsername");
-                    if(currentUser != "hewenxuan"){
-                        return e1 + d1;
-                    }else{
-                        return e + d;
-                    }*/
                 }
             }
         ]
     });
 
 }
-
 //对上传文件初始化
 $("#designPhaseFile").fileinput({
     language: 'zh', //设置语言
@@ -151,21 +133,26 @@ $("#designPhaseFile").fileinput({
 });
 
 $("#uploadFile").click(function () {
-    var type = "designPhaseFile";
-    var id = "designPhaseFile";
-    var formData = new FormData();
-    formData.append(type,$("#"+id)[0].files[0]);
-    $.ajax({
-        type:"POST",
-        url:prefix + "/uploadFile",
-        data:formData,
-        processData:false,
-        contentType:false,
-        success:function(data){
-            alert(data);
-            window.location.href = "/softData/designPhase";
-        }
-    });
+    if(currentUser != "admin"){
+        var uploadButton = document.getElementById("uploadFile");
+        uploadButton.setAttribute("disabled",true);
+    }else{
+        var type = "designPhaseFile";
+        var id = "designPhaseFile";
+        var formData = new FormData();
+        formData.append(type,$("#"+id)[0].files[0]);
+        $.ajax({
+            type:"POST",
+            url:prefix + "/uploadFile",
+            data:formData,
+            processData:false,
+            contentType:false,
+            success:function(data){
+                alert(data);
+                window.location.href = "/softData/designPhase";
+            }
+        });
+    }
 });
 
 //查询
@@ -176,13 +163,27 @@ function reLoad() {
         }
     };
     $('#exampleTable').bootstrapTable('refresh', opt);
+}
 
+function uploadOperateRecord(){
+    if(currentUser != "admin"){
+        alert("请联系管理员进行操作！");
+    }else{
+        layer.open({
+            type: 2,
+            title: '操作记录说明',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '400px'],
+            content: "/operateRecord/uploadOperateRecord" // iframe的url
+        });
+    }
 }
 
 //添加
 function add() {
-    if(currentUser != "hewenxuan"){
-        alert("请联系管理员进行添加！");
+    if(currentUser != "admin"){
+        alert("请联系管理员进行修改！");
     }else{
         layer.open({
             type: 2,
@@ -193,14 +194,22 @@ function add() {
             content: prefix + '/add' // iframe的url
         });
     }
-
 }
 
 //编辑
 function edit(id) {
-    if(currentUser != "hewenxuan"){
+    if(currentUser != "admin"){
         alert("请联系管理员进行编辑！");
     }else{
+        /*localStorage.setItem("editId",id);
+        layer.open({
+            type: 2,
+            title: '操作记录说明',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '400px'],
+            content: "/operateRecord/designPhase/editUpload" // iframe的url
+        });*/
         layer.open({
             type: 2,
             title: '编辑度量指标',
@@ -213,11 +222,52 @@ function edit(id) {
 
 }
 
+function editUploadSubmit(){
+    $.ajax({
+        cache : true,
+        type : "POST",
+        url : "/operateRecord/submit",
+        data : $('#signUpForm').serialize(), // 你的formid
+        async : false,
+        error : function(request) {
+            parent.layer.alert("网络超时");
+        },
+        success : function(data) {
+            if (data.code == 0) {
+                parent.layer.msg("操作成功");
+                parent.reLoad();
+                var index = parent.layer.getFrameIndex(window.name);
+                parent.layer.close(index);
+                parent.layer.open({
+                    type: 2,
+                    title: '编辑度量指标',
+                    maxmin: true,
+                    shadeClose: false, // 点击遮罩关闭层
+                    area: ['800px', '600px'],
+                    content: prefix + '/edit/' + editId // iframe的url
+                });
+            } else {
+                parent.layer.alert(data.msg)
+            }
+
+        }
+    });
+}
+
 //删除
 function remove(id) {
-    if(currentUser != "hewenxuan"){
+    if(currentUser != "admin"){
         alert("请联系管理员进行删除！");
     }else{
+        /*localStorage.setItem("removeId",id);
+        layer.open({
+            type: 2,
+            title: '操作记录说明',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '400px'],
+            content: "/operateRecord/designPhase/removeUpload" // iframe的url
+        });*/
         layer.confirm('确定要删除选中的记录？', {
             btn: ['确定', '取消']
         }, function () {
@@ -240,12 +290,72 @@ function remove(id) {
     }
 }
 
+function removeUploadSubmit(){
+    $.ajax({
+        cache : true,
+        type : "POST",
+        url : "/operateRecord/submit",
+        data : $('#signUpForm').serialize(), // 你的formid
+        async : false,
+        error : function(request) {
+            parent.layer.alert("网络超时");
+        },
+        success : function(data) {
+            if (data.code == 0) {
+                parent.layer.msg("操作成功");
+                parent.reLoad();
+                var index = parent.layer.getFrameIndex(window.name);
+                parent.layer.close(index);
+                top.layer.confirm('确定要删除选中的记录？', {
+                    btn: ['确定', '取消']
+                }, function () {
+                    console.log(removeId);
+                    $.ajax({
+                        url: prefix + "/remove",
+                        type: "post",
+                        data: {
+                            'id': removeId
+                        },
+                        async: false,
+                        success: function (r) {
+                            if (r.code == 0) {
+                                top.layer.msg(r.msg);
+                                top.reLoad();
+                            } else {
+                                top.layer.msg(r.msg);
+                            }
+                        }
+                    });
+                })
+            } else {
+                parent.layer.alert(data.msg)
+            }
+
+        }
+    });
+}
+
 
 //批量删除
 function batchRemove() {
-    if(currentUser != "hewenxuan"){
-        alert("请联系管理员进行批量删除！");
+    if(currentUser != "admin"){
+        alert("请联系管理员进行修改！");
     }else{
+        /*var rows = $('#exampleTable').bootstrapTable('getSelections'); // 返回所有选择的行，当没有选择的记录时，返回一个空数组
+        // localStorage.setItem("rows",rows);
+        console.log(rows.length);
+        if (rows.length == 0) {
+            layer.msg("请选择要删除的数据");
+            return;
+        }
+        layer.open({
+            type: 2,
+            title: '操作记录说明',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '400px'],
+            content: "/operateRecord/designPhase/batchRemoveUpload" // iframe的url
+        });*/
         var rows = $('#exampleTable').bootstrapTable('getSelections'); // 返回所有选择的行，当没有选择的记录时，返回一个空数组
         if (rows.length == 0) {
             layer.msg("请选择要删除的数据");
@@ -280,3 +390,57 @@ function batchRemove() {
     }
 
 }
+
+function batchRemoveUploadSubmit() {
+    $.ajax({
+        cache: true,
+        type: "POST",
+        url: "/operateRecord/submit",
+        data: $('#signUpForm').serialize(), // 你的formid
+        async: false,
+        error: function (request) {
+            parent.layer.alert("网络超时");
+        },
+        success: function (data) {
+            if (data.code == 0) {
+                parent.layer.msg("操作成功");
+                parent.reLoad();
+                var index = parent.layer.getFrameIndex(window.name);
+                parent.layer.close(index);
+                var rows = parent.$('#exampleTable').bootstrapTable('getSelections'); // 返回所有选择的行，当没有选择的记录时，返回一个空数组
+                console.log(rows.length);
+                parent.layer.confirm("确认要删除选中的'" + rows.length + "'条数据吗?", {
+                    btn: ['确定', '取消']
+                    // 按钮
+                }, function () {
+                    var ids = new Array();
+                    // 遍历所有选择的行数据，取每条数据对应的ID
+                    $.each(rows, function (i, row) {
+                        ids[i] = row['id'];
+                    });
+                    $.ajax({
+                        async: false,
+                        type: 'POST',
+                        data: {
+                            "ids": ids
+                        },
+                        url: prefix + '/batchRemove',
+                        success: function (r) {
+                            if (r.code == 0) {
+                                layer.msg(r.msg);
+                                reLoad();
+                            } else {
+                                layer.msg(r.msg);
+                            }
+                        }
+                    });
+                }, function () {
+                });
+            } else {
+                parent.layer.alert(data.msg)
+            }
+
+        }
+    });
+}
+

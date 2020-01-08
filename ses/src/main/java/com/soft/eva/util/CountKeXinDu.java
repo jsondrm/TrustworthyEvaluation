@@ -27,6 +27,9 @@ public class CountKeXinDu {
             BigDecimal b   =   new   BigDecimal(r);
             double   value   =   b.setScale(3,   BigDecimal.ROUND_HALF_UP).doubleValue();
             value = value * 10;
+            if(value < 1){
+                value = 1;
+            }
             String curMetricElement = softDataList.get(i).getMetricElement();
             resMap.put(curMetricElement, value);
         }
@@ -44,7 +47,7 @@ public class CountKeXinDu {
     public Map<String, Double> countSubAttributeKeXinDu(Map<String, List<String>> subAttributeMap, Map<String, Double> metricElementKeXinDuMap, Map<String, Double> metricElementWeightMap) {
         Map<String, Double> resMap = new HashMap<>();
 
-        double curValue = 0;
+        double curValue;
         for (Map.Entry<String, List<String>> entry : subAttributeMap.entrySet()) {
             String curSubAttribute = entry.getKey();
             List<String> curMetricElementList = entry.getValue();

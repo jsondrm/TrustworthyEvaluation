@@ -71,6 +71,16 @@ public class SoftData implements Serializable {
      */
     private String y_value;
 
+    private double trustworthyValue;
+
+    public double getTrustworthyValue() {
+        return trustworthyValue;
+    }
+
+    public void setTrustworthyValue(double trustworthyValue) {
+        this.trustworthyValue = trustworthyValue;
+    }
+
     public String getId() {
         return id;
     }
@@ -191,6 +201,7 @@ public class SoftData implements Serializable {
                 ", x_y_spec='" + x_y_spec + '\'' +
                 ", x_value='" + x_value + '\'' +
                 ", y_value='" + y_value + '\'' +
+                ", trustworthyValue='" + trustworthyValue + '\'' +
                 '}';
     }
 }

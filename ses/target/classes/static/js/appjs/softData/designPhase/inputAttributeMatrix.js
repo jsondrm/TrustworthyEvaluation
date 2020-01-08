@@ -6,20 +6,20 @@ var attributeMatrixArray = document.getElementsByName("attributeMatrixArrayInDes
 var currentUser = localStorage.getItem("currentUsername");
 
 function change(){
-    if(currentUser != "hewenxuan"){
+    if(currentUser != "admin"){
         alert("请联系管理员进行修改！");
     }else{
         layer.open({
             type: 2,
-            title: '原始凭证上传',
+            title: '操作记录添加',
             maxmin: true,
             shadeClose: false, // 点击遮罩关闭层
             area: ['800px', '400px'],
-            content: "/operateRecord/designPhase" + '/upload' // iframe的url
+            content: "/operateRecord" + '/upload' // iframe的url
         });
     }
-
 }
+
 function saveArray() {
     var arrayNew = [];
     for (var i = 0; i < attributeMatrixArray.length; i++) {

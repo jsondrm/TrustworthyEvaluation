@@ -3,22 +3,22 @@ package com.soft.eva.domain;
 import java.io.Serializable;
 
 public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
+   //f, private static final long serialVersionUID = 1L;
 
-    private Long userId;
+    private String userId;//工号
     private String username;//姓名（用户名）
     private String password;//登录密码
     private String dptName;//所属部门
     private String group;//分组
     private String email;//邮箱
     private String mobile;//手机号
-    private Integer status;//状态：0：离职；1：正常
+    private Integer status = 1;//状态：0：离职；1：正常
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

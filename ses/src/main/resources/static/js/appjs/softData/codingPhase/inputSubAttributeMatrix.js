@@ -8,7 +8,7 @@ function change(){
     }else{
         layer.open({
             type: 2,
-            title: '原始凭证上传',
+            title: '操作记录添加',
             maxmin: true,
             shadeClose: false, // 点击遮罩关闭层
             area: ['800px', '400px'],

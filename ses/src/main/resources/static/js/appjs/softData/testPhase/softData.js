@@ -2,6 +2,8 @@ var prefix = "/softData/testPhase";
 currentUser = localStorage.getItem("currentUsername");
 $(function () {
     if(currentUser != "admin"){
+        var uploadButton = document.getElementById("uploadFile");
+        uploadButton.setAttribute("disabled",true);
         var buttons = document.getElementsByTagName("button");
         for(var i = 0; i < buttons.length; i++){
             buttons[i].setAttribute("disabled", true)
@@ -106,10 +108,10 @@ function load() {
                 align: 'center',
                 //width : '200px',
                 formatter: function (value, row, index) {
-                    var e = '<a class="btn btn-primary btn-sm" href="#" mce_href="#" title="编辑" onclick="edit(\''
+                    var e = '<a class="btn btn-primary btn-sm" href="#" mce_href="#" title="编辑"  disabled="true" onclick="edit(\''
                         + row.id
                         + '\')"><i class="fa fa-edit"></i></a>';
-                    var d = '<a class="btn btn-warning btn-sm" href="#" title="删除" mce_href="#" onclick="remove(\''
+                    var d = '<a class="btn btn-warning btn-sm" href="#" title="删除" mce_href="#"  disabled="true" onclick="remove(\''
                         + row.id
                         + '\')"><i class="fa fa-remove"></i></a>';
                     return e + d;
@@ -139,27 +141,21 @@ $("#testPhaseFile").fileinput({
 });
 
 $("#uploadFile").click(function () {
-    if(currentUser != "admin"){
-        var uploadButton = document.getElementById("uploadFile");
-        uploadButton.setAttribute("disabled",true);
-    }else{
-        var type = "testPhaseFile";
-        var id = "testPhaseFile";
-        var formData = new FormData();
-        formData.append(type,$("#"+id)[0].files[0]);
-        $.ajax({
-            type:"POST",
-            url:prefix + "/uploadFile",
-            data:formData,
-            processData:false,
-            contentType:false,
-            success:function(data){
-                alert(data);
-                window.location.href = "/softData/testPhase";
-            }
-        });
-    }
-
+    var type = "testPhaseFile";
+    var id = "testPhaseFile";
+    var formData = new FormData();
+    formData.append(type,$("#"+id)[0].files[0]);
+    $.ajax({
+        type:"POST",
+        url:prefix + "/uploadFile",
+        data:formData,
+        processData:false,
+        contentType:false,
+        success:function(data){
+            alert(data);
+            window.location.href = "/softData/testPhase";
+        }
+    });
 });
 
 //查询
@@ -173,16 +169,35 @@ function reLoad() {
 
 }
 
+function uploadOperateRecord(){
+    if(currentUser != "admin"){
+        alert("请联系管理员进行操作！");
+    }else{
+        layer.open({
+            type: 2,
+            title: '操作记录说明',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '400px'],
+            content: "/operateRecord/uploadOperateRecord" // iframe的url
+        });
+    }
+}
+
 //添加
 function add() {
-    layer.open({
-        type: 2,
-        title: '增加度量指标',
-        maxmin: true,
-        shadeClose: false, // 点击遮罩关闭层
-        area: ['800px', '600px'],
-        content: prefix + '/add' // iframe的url
-    });
+    if(currentUser != "admin"){
+        alert("请联系管理员进行添加！");
+    }else{
+        layer.open({
+            type: 2,
+            title: '增加度量指标',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '600px'],
+            content: prefix + '/add' // iframe的url
+        });
+    }
 }
 
 //编辑

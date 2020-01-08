@@ -1,4 +1,3 @@
-// 以下为官方示例
 $().ready(function() {
     validateRule();
 });

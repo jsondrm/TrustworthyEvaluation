@@ -55,6 +55,8 @@ function load() {
                     if (value == '0') {
                         return '<span class="label label-danger">待评测</span>';
                     } else if (value == '1') {
+                        return '<span class="label label-primary">评测中</span>';
+                    }else if (value == '2') {
                         return '<span class="label label-primary">评测结束</span>';
                     }
                 }
@@ -105,9 +107,9 @@ function load() {
                     var t = '<a class="btn btn-info btn-sm ' +  '" href="#" title="报告"  mce_href="#" onclick="showReport(\''
                         + row.number
                         + '\')" disabled="false"><i class="fa fa-search"></i></a> ';
-                    if (value == '0') {
+                    if (value == '0' || value== '1') {
                         return e + d + t;
-                    } else if (value == '1') {
+                    } else if (value == '2') {
                         return e + d + s;
                     }
                 }
@@ -117,14 +119,19 @@ function load() {
                 formatter: function (value, row, index) {
                     var m = '<button type="button" class="btn btn-primary  btn-sm" style="margin-right:15px;" onclick="goToEvaluate(\''
                         + row.number
-                        + '\')">进入测评</button>';
+                        + '\')">开始测评</button>';
                     var n = '<button type="button" class="btn btn-primary  btn-sm" style="margin-right:15px;" onclick="goToEvaluate(\''
                         + row.number
-                        + '\')" disabled="true">进入测评</button>';
+                        + '\')" disabled="true">测评中</button>';
+                    var p = '<button type="button" class="btn btn-primary  btn-sm" style="margin-right:15px;" onclick="goToEvaluate(\''
+                        + row.number
+                        + '\')" disabled="true">结束测评</button>';
                     if (value == '0') {
                         return m;
                     } else if (value == '1') {
                         return n;
+                    }else{
+                        return p;
                     }
                 }
             }
@@ -134,12 +141,6 @@ function load() {
 
 //查询
 function reLoad() {
-    // var opt = {
-    //     query: {
-    //         type: $('.chosen-select').val()
-    //     }
-    // };
-    // $('#exampleTable').bootstrapTable('refresh', opt);
     $('#exampleTable').bootstrapTable('refresh');
 
 }
@@ -151,7 +152,7 @@ function add() {
         title: '增加测评软件',
         maxmin: true,
         shadeClose: false, // 点击遮罩关闭层
-        area: ['900px', '600px'],
+        area: ['800px', '520px'],
         content: prefix + '/add' // iframe的url
     });
 }
@@ -163,7 +164,7 @@ function edit(id) {
         title: '编辑测评软件',
         maxmin: true,
         shadeClose: false, // 点击遮罩关闭层
-        area: ['800px', '600px'],
+        area: ['800px', '500px'],
         content: prefix + '/edit/' + id // iframe的url
     });
 }
@@ -198,7 +199,24 @@ function showReport(number) {
 function goToEvaluate(number){
     // $('button').addClass('disabled');
     localStorage.setItem("curSoftwareNumberEvaluating",number);
-    window.location.href = '/main';
+    $.ajax({
+        url: prefix + "/goToEvaluate",
+        type: "post",
+        data: {
+            'number': number
+        },
+        success: function (r) {
+            if (r.code == 0) {
+                layer.msg(r.msg);
+                reLoad();
+                location.reload();
+                // window.location.href = '/main';
+            } else {
+                layer.msg(r.msg);
+            }
+        }
+    });
+
 }
 
 //批量删除

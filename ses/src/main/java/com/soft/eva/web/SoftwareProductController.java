@@ -2,6 +2,7 @@ package com.soft.eva.web;
 
 import com.soft.eva.domain.SoftwareProduct;
 import com.soft.eva.service.MeasurementDataService;
+import com.soft.eva.service.SoftDataService;
 import com.soft.eva.service.SoftwareProductService;
 import com.soft.eva.util.PageUtils;
 import com.soft.eva.util.QueryCondition;
@@ -23,6 +24,9 @@ public class SoftwareProductController {
     @Autowired
     MeasurementDataService measurementDataService;
 
+    @Autowired
+    SoftDataService softDataService;
+
     @RequestMapping(value = "",method = RequestMethod.GET)
     public String softwareProduct(){
         return "softwareProduct/softwareProductList";
@@ -41,6 +45,25 @@ public class SoftwareProductController {
         int total = softwareProductService.count(queryCondition);
         PageUtils pageUtils = new PageUtils(softwareProductList, total);
         return pageUtils;
+    }
+
+    /**
+     * 开始测评 更改状态
+     * @param number
+     * @return
+     */
+    @RequestMapping(value = "/goToEvaluate",method = RequestMethod.POST)
+    @ResponseBody
+    public ReturnUtil goToEvaluate(String number){
+        SoftwareProduct softwareProductEvaluating = softwareProductService.getByStatus(1);
+        if(softwareProductEvaluating == null){
+            softwareProductEvaluating = softwareProductService.get(number);
+            softwareProductEvaluating.setStatus(1);
+            if(softwareProductService.update(softwareProductEvaluating) > 0){
+                return ReturnUtil.ok();
+            }
+        }
+        return ReturnUtil.error("操作失败！当前有其他软件产品正在测评中！");
     }
 
     /**
@@ -101,6 +124,7 @@ public class SoftwareProductController {
     @ResponseBody
     public ReturnUtil remove(String number){
         measurementDataService.delete("softwareBelongsTo",number );
+        softDataService.delete("softwareNumber", number);
         if(softwareProductService.remove(number) > 0){
             return ReturnUtil.ok();
         }
@@ -114,6 +138,11 @@ public class SoftwareProductController {
     @RequestMapping(value = "/batchRemove",method = RequestMethod.POST)
     @ResponseBody
     public ReturnUtil batchRemove(@RequestParam("ids[]") String[] numbers){
+        for(int i = 0; i < numbers.length; i++){
+            String number = numbers[i];
+            measurementDataService.delete("softwareBelongsTo",number );
+            softDataService.delete("softwareNumber", number);
+        }
         if(softwareProductService.batchRemove(numbers) > 0){
             return ReturnUtil.ok();
         }

@@ -1,5 +1,14 @@
 var prefix = "/softData/codingPhase";
+currentUser = localStorage.getItem("currentUsername");
 $(function () {
+    if(currentUser != "admin"){
+        var uploadButton = document.getElementById("uploadFile");
+        uploadButton.setAttribute("disabled",true);
+        var buttons = document.getElementsByTagName("button");
+        for(var i = 0; i < buttons.length; i++){
+            buttons[i].setAttribute("disabled", true)
+        }
+    }
     load();
 });
 
@@ -125,10 +134,10 @@ function load() {
                 align: 'center',
                 //width : '200px',
                 formatter: function (value, row, index) {
-                    var e = '<a class="btn btn-primary btn-sm" href="#" mce_href="#" title="编辑" onclick="edit(\''
+                    var e = '<a class="btn btn-primary btn-sm" href="#" mce_href="#" title="编辑"  disabled="true" onclick="edit(\''
                         + row.id
                         + '\')"><i class="fa fa-edit"></i></a>';
-                    var d = '<a class="btn btn-warning btn-sm" href="#" title="删除" mce_href="#" onclick="remove(\''
+                    var d = '<a class="btn btn-warning btn-sm" href="#" title="删除" mce_href="#"  disabled="true" onclick="remove(\''
                         + row.id
                         + '\')"><i class="fa fa-remove"></i></a>';
                     return e + d;
@@ -186,51 +195,80 @@ function reLoad() {
 
 }
 
+function uploadOperateRecord(){
+    if(currentUser != "admin"){
+        alert("请联系管理员进行操作！");
+    }else{
+        layer.open({
+            type: 2,
+            title: '操作记录说明',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '400px'],
+            content: "/operateRecord/uploadOperateRecord" // iframe的url
+        });
+    }
+}
+
 //添加
 function add() {
-    layer.open({
-        type: 2,
-        title: '增加度量指标',
-        maxmin: true,
-        shadeClose: false, // 点击遮罩关闭层
-        area: ['800px', '600px'],
-        content: prefix + '/add' // iframe的url
-    });
+    if(currentUser != "admin"){
+        alert("请联系管理员进行添加！");
+    }else{
+        layer.open({
+            type: 2,
+            title: '增加度量指标',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '600px'],
+            content: prefix + '/add' // iframe的url
+        });
+    }
 }
 
 //编辑
 function edit(id) {
-    layer.open({
-        type: 2,
-        title: '编辑度量指标',
-        maxmin: true,
-        shadeClose: false, // 点击遮罩关闭层
-        area: ['800px', '600px'],
-        content: prefix + '/edit/' + id // iframe的url
-    });
+    if(currentUser != "admin"){
+        alert("请联系管理员进行编辑！");
+    }else{
+        layer.open({
+            type: 2,
+            title: '编辑度量指标',
+            maxmin: true,
+            shadeClose: false, // 点击遮罩关闭层
+            area: ['800px', '600px'],
+            content: prefix + '/edit/' + id // iframe的url
+        });
+    }
+
 }
 
 //删除
 function remove(id) {
-    layer.confirm('确定要删除选中的记录？', {
-        btn: ['确定', '取消']
-    }, function () {
-        $.ajax({
-            url: prefix + "/remove",
-            type: "post",
-            data: {
-                'id': id
-            },
-            success: function (r) {
-                if (r.code == 0) {
-                    layer.msg(r.msg);
-                    reLoad();
-                } else {
-                    layer.msg(r.msg);
+    if(currentUser != "admin"){
+        alert("请联系管理员进行删除！");
+    }else{
+        layer.confirm('确定要删除选中的记录？', {
+            btn: ['确定', '取消']
+        }, function () {
+            $.ajax({
+                url: prefix + "/remove",
+                type: "post",
+                data: {
+                    'id': id
+                },
+                success: function (r) {
+                    if (r.code == 0) {
+                        layer.msg(r.msg);
+                        reLoad();
+                    } else {
+                        layer.msg(r.msg);
+                    }
                 }
-            }
-        });
-    })
+            });
+        })
+    }
+
 }
 
 

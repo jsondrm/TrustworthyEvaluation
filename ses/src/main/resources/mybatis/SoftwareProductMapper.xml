@@ -7,6 +7,14 @@
 		select `number`,`softwareName`,`keXinDu`,`status`,`leader`,`developManager`,`testManager`,`QAManager`,`securityLevel`,`description` from sys_softwareProduct where number = #{value}
 	</select>
 
+    <select id="getByStatus" resultType="com.soft.eva.domain.SoftwareProduct">
+		select `number`,`softwareName`,`keXinDu`,`status`,`leader`,`developManager`,`testManager`,`QAManager`,`securityLevel`,`description` from sys_softwareProduct where status = #{value}
+	</select>
+
+    <select id="findAll" resultType="com.soft.eva.domain.SoftwareProduct">
+		select `number`,`softwareName`,`keXinDu`,`status`,`leader`,`developManager`,`testManager`,`QAManager`,`securityLevel`,`description` from sys_softwareProduct
+	</select>
+
     <select id="list" resultType="com.soft.eva.domain.SoftwareProduct">
         select
         `number`,`softwareName`,`keXinDu`,`status`,`leader`,`developManager`,`testManager`,`QAManager`,`securityLevel`,`description`

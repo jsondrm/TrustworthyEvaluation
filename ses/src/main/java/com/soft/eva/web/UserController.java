@@ -56,7 +56,7 @@ public class UserController {
      * @return
      */
     @RequestMapping(value = "/edit/{id}",method = RequestMethod.GET)
-    public String edit(Model model, @PathVariable("id") Long id){
+    public String edit(Model model, @PathVariable("id") String id){
         User user = userService.get(id);
         model.addAttribute("user", user);
         return "user/edit";
@@ -70,10 +70,17 @@ public class UserController {
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ResponseBody
     public ReturnUtil save(User user){
-        if(userService.save(user) > 0){
-            return ReturnUtil.ok();
+        User userIdExisted = userService.get(user.getUserId());
+        User usernameExisted = userService.getByUsername(user.getUsername());
+        if(userIdExisted == null && usernameExisted == null){
+            if(userService.save(user) > 0){
+                return ReturnUtil.ok();
+            }
         }
-        return ReturnUtil.error();
+        if(usernameExisted != null){
+            return ReturnUtil.error("该用户名已存在！");
+        }
+        return ReturnUtil.error("该工号已存在！");
     }
 
     /**
@@ -96,7 +103,7 @@ public class UserController {
      */
     @RequestMapping(value = "/remove",method = RequestMethod.POST)
     @ResponseBody
-    public ReturnUtil update(Long id){
+    public ReturnUtil remove(String id){
         if(userService.remove(id) > 0){
             return ReturnUtil.ok();
         }
@@ -109,7 +116,7 @@ public class UserController {
      */
     @RequestMapping(value = "/batchRemove",method = RequestMethod.POST)
     @ResponseBody
-    public ReturnUtil batchRemove(@RequestParam("ids[]") Long[] ids){
+    public ReturnUtil batchRemove(@RequestParam("ids[]") String[] ids){
         if(userService.batchRemove(ids) > 0){
             return ReturnUtil.ok();
         }
@@ -123,7 +130,7 @@ public class UserController {
      * @return
      */
     @RequestMapping(value = "/resetPwd/{id}",method = RequestMethod.GET)
-    public String resetPwd(Model model, @PathVariable("id") Long id){
+    public String resetPwd(Model model, @PathVariable("id") String id){
         User user = new User();
         user.setUserId(id);
         model.addAttribute("user", user);

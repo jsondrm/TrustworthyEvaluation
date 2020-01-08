@@ -21,4 +21,9 @@ public interface SoftwareProductDao {
     int remove(String number);
 
     int batchRemove(String[] numbers);
+
+    SoftwareProduct getByStatus(int status);
+
+    List<SoftwareProduct> findAll();
+
 }

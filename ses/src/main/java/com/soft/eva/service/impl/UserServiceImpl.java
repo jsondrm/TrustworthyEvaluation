@@ -19,7 +19,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     UserDao userMapper;
     @Override
-    public User get(Long id) {
+    public User get(String id) {
         User user = userMapper.get(id);
         return user;
     }
@@ -53,12 +53,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int remove(Long userId) {
+    public int remove(String userId) {
         return userMapper.remove(userId);
     }
 
     @Override
-    public int batchRemove(Long[] userIds) {
+    public int batchRemove(String[] userIds) {
         int count = userMapper.batchRemove(userIds);
         return count;
     }

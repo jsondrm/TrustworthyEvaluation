@@ -9,7 +9,7 @@
     <p>子属性正互反矩阵</p>
     <form>
         <div th:each="map : ${resMap}">
-            <table class="table table-bordered">
+            <table class="table table-bordered" id="matrix">
                 <caption th:text="${map.key}"></caption>
                 <thead>
                 <tr>
@@ -21,7 +21,7 @@
                 <tr th:each="subAttribute : ${map.value}">
                     <td th:text="${subAttribute}"></td>
                     <td th:each="subAttribute : ${map.value}"><input type="text" name="subAttributeMatrixArrayInTestPhase[]" id="subAttributeMatrixArrayInTestPhase"
-                                                                      value="1"/>
+                                                                      value="1" disabled="true"/>
                     </td>
                 </tr>
                 </tbody>

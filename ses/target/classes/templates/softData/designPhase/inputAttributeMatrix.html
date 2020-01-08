@@ -9,11 +9,8 @@
     <p>属性正互反矩阵</p>
     <form class="form-horizontal m-t">
         <div th:each="map : ${resMap}">
-            <table class="table table-bordered" id="designAttributeTable">
+            <table class="table table-bordered" id="matrix">
                 <caption th:text="${map.key}"></caption>
-                <!--<button type="button" class="btn btn-primary" onclick="change()">
-                    <i class="fa fa-edit" aria-hidden="true"></i>修改
-                </button>-->
                 <thead>
                 <tr>
                     <th>属性</th>

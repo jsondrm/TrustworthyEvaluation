@@ -25,6 +25,17 @@ public class SoftwareProductServiceImpl implements SoftwareProductService {
     }
 
     @Override
+    public SoftwareProduct getByStatus(int status) {
+        SoftwareProduct softwareProduct = softwareProductMapper.getByStatus(status);
+        return softwareProduct;
+    }
+
+    @Override
+    public List<SoftwareProduct> findAll() {
+        return softwareProductMapper.findAll();
+    }
+
+    @Override
     public List<SoftwareProduct> list(Map<String, Object> map) {
         return softwareProductMapper.list(map);
     }

@@ -7,7 +7,7 @@ public class SoftwareProduct implements Serializable {
     private String number;//项目编号
     private String softwareName;//待评估软件名称
     private Double keXinDu = Double.valueOf(0.0);//软件可信度
-    private Integer status = 0;//状态，0：表示待评测；1：表示评测结束
+    private Integer status = 0;//状态，0：表示待评测；1：表示评测进行时；2：评测结束
     private String leader;//项目组长
     private String developManager;//开发负责人
     private String testManager;//测试负责人
@@ -100,7 +100,7 @@ public class SoftwareProduct implements Serializable {
         return "SoftwareProduct{" +
                 "number='" + number + '\'' +
                 ", softwareName='" + softwareName + '\'' +
-                ", keXinDu='" + keXinDu + '\'' +
+                ", keXinDu=" + keXinDu +
                 ", status=" + status +
                 ", leader='" + leader + '\'' +
                 ", developManager='" + developManager + '\'' +
